@@ -11,6 +11,7 @@
 #include <QFontMetrics>
 #include <QTextEdit>
 #include <QTextCursor>
+#include <QTextDocument>
 #include <QVBoxLayout>
 #include <QWidget>
 
@@ -185,6 +186,8 @@ MainWindow::MainWindow(const std::string& icon_name)
     output_view_ = new QTextEdit(central);
     output_view_->setObjectName("output-view");
     output_view_->setReadOnly(true);
+    output_view_->setUndoRedoEnabled(false);
+    output_view_->document()->setMaximumBlockCount(5000);
 
     progress_bar_ = new QProgressBar(central);
     progress_bar_->setObjectName("progress-bar");

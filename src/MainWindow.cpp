@@ -35,6 +35,12 @@ QLineEdit#destination-edit {
   padding: 4px;
 }
 
+QLineEdit#origin-edit[placeholderStyled="true"],
+QLineEdit#destination-edit[placeholderStyled="true"] {
+  font-style: italic;
+  font-size: 90%;
+}
+
 QPushButton#browse-origin,
 QPushButton#browse-destination,
 QPushButton#sync-button {
@@ -52,6 +58,12 @@ QPushButton#browse-destination[syncRunning="true"] {
   border: 1px solid #4a4a4a;
 }
 
+QPushButton#browse-origin:enabled:hover,
+QPushButton#browse-destination:enabled:hover {
+  background-color: #1c0606;
+  border: 1px solid #531717;
+}
+
 QPushButton#browse-origin:disabled,
 QPushButton#browse-destination:disabled {
   color: #a9a9a9;
@@ -64,6 +76,11 @@ QPushButton#sync-button {
   background-color: #b51616;
   border: 1px solid #ff4d4d;
   color: #fff1f1;
+}
+
+QPushButton#sync-button:enabled:hover {
+  background-color: #8f1010;
+  border: 1px solid #d33b3b;
 }
 
 QTextEdit#output-view {
@@ -130,6 +147,7 @@ MainWindow::MainWindow(const std::string& icon_name)
 
     origin_chooser_ = new DirectoryChooserWidget(
         "Origin:",
+        "The folder to be backed up.",
         "Select origin folder",
         "origin-label",
         "origin-edit",
@@ -137,6 +155,7 @@ MainWindow::MainWindow(const std::string& icon_name)
         central);
     destination_chooser_ = new DirectoryChooserWidget(
         "Destination:",
+        "A folder inside a back-up medium.",
         "Select destination folder",
         "destination-label",
         "destination-edit",
@@ -209,6 +228,15 @@ MainWindow::MainWindow(const std::string& icon_name)
     });
 }
 
+MainWindow::~MainWindow() {
+    runner_.set_output_callback(nullptr);
+    runner_.set_progress_callback(nullptr);
+    runner_.set_finished_callback(nullptr);
+    if (runner_.is_running()) {
+        runner_.cancel();
+    }
+}
+
 void MainWindow::apply_stylesheet() {
     setStyleSheet(kAppStyle);
 }
@@ -259,7 +287,7 @@ void MainWindow::on_sync_clicked() {
     cancel_requested_ = false;
     set_running_state(true);
     append_output(
-        "$ rsync -avP --info=progress2 --delete \"" + origin + "\" \"" +
+        "$ rsync -av --info=progress2 --delete \"" + origin + "\" \"" +
         destination + "\"\n\n");
 
     std::string start_error;

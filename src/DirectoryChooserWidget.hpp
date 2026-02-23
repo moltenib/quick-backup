@@ -10,6 +10,7 @@ class DirectoryChooserWidget : public QWidget {
 public:
     DirectoryChooserWidget(
         const QString& label_text,
+        const QString& placeholder_text,
         const QString& chooser_title,
         const QString& label_object_name,
         const QString& line_edit_object_name,
@@ -23,6 +24,8 @@ public:
 
 private:
     void open_dialog();
+    void sync_entry_height();
+    void update_entry_style();
 
     QString chooser_title_;
     QLabel* label_;

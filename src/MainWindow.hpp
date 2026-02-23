@@ -14,6 +14,7 @@ class QProgressBar;
 class MainWindow : public QMainWindow {
 public:
     explicit MainWindow(const std::string& icon_name);
+    ~MainWindow() override;
 
 private:
     void apply_stylesheet();

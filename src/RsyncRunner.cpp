@@ -28,6 +28,11 @@ RsyncRunner::RsyncRunner() : process_(new QProcess()), running_(false) {
 
 RsyncRunner::~RsyncRunner() {
     if (process_ != nullptr) {
+        output_callback_ = nullptr;
+        progress_callback_ = nullptr;
+        finished_callback_ = nullptr;
+        QObject::disconnect(process_, nullptr, nullptr, nullptr);
+
         if (process_->state() != QProcess::NotRunning) {
             process_->kill();
             process_->waitForFinished(1000);
@@ -69,7 +74,6 @@ bool RsyncRunner::start(const std::string& origin, const std::string& destinatio
     QStringList args;
     args << "-a"
          << "-v"
-         << "-P"
          << "--info=progress2"
          << "--delete"
          << QString::fromStdString(normalize_rsync_path(origin))
@@ -195,22 +199,27 @@ void RsyncRunner::handle_ready_read() {
 
     pending_output_ += QString::fromUtf8(data).toStdString();
 
+    std::size_t cursor = 0;
     while (true) {
-        const std::size_t line_end = pending_output_.find_first_of("\r\n");
+        const std::size_t line_end = pending_output_.find_first_of("\r\n", cursor);
         if (line_end == std::string::npos) {
             break;
         }
 
-        const std::string line = pending_output_.substr(0, line_end);
+        const std::string line = pending_output_.substr(cursor, line_end - cursor);
 
         std::size_t consume_end = line_end + 1;
         while (consume_end < pending_output_.size() &&
                (pending_output_[consume_end] == '\r' || pending_output_[consume_end] == '\n')) {
             ++consume_end;
         }
-        pending_output_.erase(0, consume_end);
+        cursor = consume_end;
 
         emit_filtered_line(line);
+    }
+
+    if (cursor > 0) {
+        pending_output_.erase(0, cursor);
     }
 }
 

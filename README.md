@@ -1,6 +1,6 @@
 # Quick Back-Up
 
-GUI wrapper around `rsync -aP --delete` to mirror an origin folder into a destination.
+GUI wrapper around `rsync -av --info=progress2 --delete` to mirror an origin folder into a destination.
 
 ## Python version
 

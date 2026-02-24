@@ -26,12 +26,14 @@ for dir in "$@"; do
     fi
 done
 
-IFS=':' read -r -a path_dirs <<< "${PATH:-}"
-for dir in "${path_dirs[@]}"; do
-    if [[ -n "${dir}" && -d "${dir}" ]]; then
-        search_dirs+=("${dir}")
-    fi
-done
+if [[ "${COLLECT_WIN_DLLS_USE_PATH:-0}" == "1" ]]; then
+    IFS=':' read -r -a path_dirs <<< "${PATH:-}"
+    for dir in "${path_dirs[@]}"; do
+        if [[ -n "${dir}" && -d "${dir}" ]]; then
+            search_dirs+=("${dir}")
+        fi
+    done
+fi
 
 declare -A seen_search_dirs=()
 declare -a normalized_search_dirs=()
@@ -88,6 +90,8 @@ while IFS= read -r -d '' file; do
     queue+=("${file}")
 done < <(find "${DIST_DIR}" -type f \( -iname '*.exe' -o -iname '*.dll' \) -print0)
 
+echo "collect-win-dlls: scanning ${#queue[@]} module(s) in ${DIST_DIR}"
+
 declare -A seen_modules=()
 queue_index=0
 while ((queue_index < ${#queue[@]})); do
@@ -126,6 +130,10 @@ while ((queue_index < ${#queue[@]})); do
         fi
         queue+=("${dest_path}")
     done <<< "${ldd_output}"
+
+    if ((queue_index % 50 == 0)); then
+        echo "collect-win-dlls: processed ${queue_index}/${#queue[@]}"
+    fi
 done
 
 echo "collect-win-dlls: dependency copy complete for ${DIST_DIR}"

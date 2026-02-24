@@ -21,11 +21,15 @@ RUNTIME_MANIFEST := $(ROOT_DIR)/.runtime-libs-manifest
 WIN_DEPLOY_DIR := $(ROOT_DIR)/dist
 WINDEPLOYQT ?= windeployqt6
 WIN_MINGW_BIN := $(dir $(shell command -v $(CXX) 2>/dev/null))
+NSIS ?= makensis
+NSIS_SCRIPT := scripts/simple-mirror-installer.nsi
+APP_VERSION ?= 1.0.0
 
 BUNDLE_RSYNC ?= 0
 ifeq ($(OS),Windows_NT)
 EXE_SUFFIX := .exe
 BIN := $(WIN_DEPLOY_DIR)/simple-mirror$(EXE_SUFFIX)
+LDFLAGS += -mwindows
 else
 LDFLAGS += -Wl,-rpath,'$$ORIGIN'
 endif
@@ -40,7 +44,7 @@ ifeq ($(BUNDLE_RSYNC),1)
 DEPLOY_WINDOWS_DEPS += $(MSYS2_RSYNC_EXE)
 endif
 
-.PHONY: all run clean bundle-rsync clean-bundle bundle-runtime clean-runtime deploy-windows clean-windows-deploy translations
+.PHONY: all run clean bundle-rsync clean-bundle bundle-runtime clean-runtime deploy-windows clean-windows-deploy translations installer-windows
 
 all: $(ALL_TARGETS) translations
 
@@ -84,10 +88,24 @@ ifeq ($(OS),Windows_NT)
 	else \
 		echo "Warning: windeployqt not found, Qt runtime was not auto-copied"; \
 	fi; \
+	echo "Collecting runtime DLL dependencies with ldd (this may take a while)"; \
 	bash "$(WIN_DLL_COLLECT_SCRIPT)" "$(WIN_DEPLOY_DIR)" "$(WIN_MINGW_BIN)" "$$qt_bin_dir"; \
 	echo "Windows deployment is ready in $(WIN_DEPLOY_DIR)"
 else
 	@echo "deploy-windows is only available when OS=Windows_NT"
+	@exit 1
+endif
+
+installer-windows: deploy-windows
+ifeq ($(OS),Windows_NT)
+	@if ! command -v "$(NSIS)" >/dev/null 2>&1; then \
+		echo "installer-windows requires NSIS (makensis)"; \
+		exit 1; \
+	fi
+	"$(NSIS)" -DAPP_VERSION="$(APP_VERSION)" "$(NSIS_SCRIPT)"
+	@echo "NSIS installer created: $(ROOT_DIR)/simple-mirror-setup-$(APP_VERSION).exe"
+else
+	@echo "installer-windows is only available when OS=Windows_NT"
 	@exit 1
 endif
 

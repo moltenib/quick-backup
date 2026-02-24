@@ -41,6 +41,7 @@ Targets:
 - `make bundle-runtime`: Linux-only runtime bundling (shared libs + Qt plugins + `qt.conf` next to executable)
 - `make clean-runtime`: remove files created by `bundle-runtime`
 - `make deploy-windows`: create `dist/` with `simple-mirror.exe`, MinGW runtime DLLs, Qt runtime via `windeployqt`, locales, and bundled rsync if present
+- `make installer-windows`: run `deploy-windows` and build an NSIS installer (`simple-mirror-setup-<version>.exe`)
 - `make clean-windows-deploy`: remove `dist/`
 
 ## Translations

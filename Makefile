@@ -21,6 +21,7 @@ WIN_DEPLOY_DIR := $(ROOT_DIR)/dist
 WINDEPLOYQT ?= windeployqt6
 WIN_MINGW_BIN := $(dir $(shell command -v $(CXX) 2>/dev/null))
 WIN_RUNTIME_DLLS := libgcc_s_seh-1.dll libstdc++-6.dll libwinpthread-1.dll
+WIN_EXTRA_DLL_PATTERNS := libbz2-*.dll libdouble-conversion*.dll libicudt*.dll libicuin*.dll libicuuc*.dll
 
 BUNDLE_RSYNC ?= 0
 ifeq ($(OS),Windows_NT)
@@ -65,6 +66,8 @@ deploy-windows: $(DEPLOY_WINDOWS_DEPS)
 ifeq ($(OS),Windows_NT)
 	@set -eu; \
 	exe_name="$$(basename "$(BIN)")"; \
+	qt_bin_dir="$$(qtpaths6 --query QT_INSTALL_BINS 2>/dev/null || true)"; \
+	if [ -z "$$qt_bin_dir" ]; then qt_bin_dir="$$(qtpaths --query QT_INSTALL_BINS 2>/dev/null || true)"; fi; \
 	mkdir -p "$(WIN_DEPLOY_DIR)"; \
 	if [ "$(BIN)" != "$(ROOT_DIR)/$$exe_name" ] && [ -f "$(ROOT_DIR)/$$exe_name" ]; then \
 		rm -f "$(ROOT_DIR)/$$exe_name"; \
@@ -78,6 +81,18 @@ ifeq ($(OS),Windows_NT)
 			cp -f "$$dll_path" "$(WIN_DEPLOY_DIR)/"; \
 		else \
 			echo "Warning: $$dll not found"; \
+		fi; \
+	done; \
+	for pat in $(WIN_EXTRA_DLL_PATTERNS); do \
+		found=0; \
+		for src in "$(WIN_MINGW_BIN)"/$$pat "$$qt_bin_dir"/$$pat; do \
+			if [ -f "$$src" ]; then \
+				cp -f "$$src" "$(WIN_DEPLOY_DIR)/"; \
+				found=1; \
+			fi; \
+		done; \
+		if [ $$found -eq 0 ]; then \
+			echo "Warning: no match for $$pat"; \
 		fi; \
 	done; \
 	mkdir -p "$(WIN_DEPLOY_DIR)/resources"; \

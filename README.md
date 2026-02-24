@@ -1,103 +1,77 @@
 # Simple Mirror
 
-GUI wrapper around `rsync -av --info=progress2 --delete` to mirror an origin folder into a destination.
+Qt GUI wrapper around `rsync -av --info=progress2 --delete` to mirror origin to destination
 
-## Qt version (C++)
+## Code layout
 
-The C++ app is split by concern:
+- `src/main.cpp`: app startup
+- `src/views/MainWindow.hpp` + `src/views/MainWindow.cpp`: main UI, validation, dialogs, progress
+- `src/views/DirectoryChooserWidget.hpp` + `src/views/DirectoryChooserWidget.cpp`: directory chooser row
+- `src/controllers/RsyncRunner.hpp` + `src/controllers/RsyncRunner.cpp`: rsync process and output parsing
+- `src/utils/AppSetup.hpp` + `src/utils/AppSetup.cpp`: icon and translation setup
 
-- `src/main.cpp`: application startup.
-- `src/views/MainWindow.hpp` + `src/views/MainWindow.cpp`: Qt UI, validation, dialogs, and progress display.
-- `src/views/DirectoryChooserWidget.hpp` + `src/views/DirectoryChooserWidget.cpp`: directory selection UI row.
-- `src/controllers/RsyncRunner.hpp` + `src/controllers/RsyncRunner.cpp`: rsync process lifecycle and output parsing.
-- `src/utils/AppSetup.hpp` + `src/utils/AppSetup.cpp`: icon and translation initialization.
-
-### Build
+## Build
 
 Requirements:
 
 - `make`
-- A C++17 compiler
+- C++17 compiler
 - `pkg-config`
-- `Qt6 Widgets`
+- Qt6 Widgets
 - `lrelease` (Qt Linguist tools)
 
-Build and run:
+Build:
 
 ```bash
 make
-./simple-mirror
 ```
 
-Useful targets:
+Run:
 
-- `make run`: build and launch
-- `make clean`: remove objects and binary
-- `make translations`: compile each `resources/locales/<lang>/LC_MESSAGES/simple-mirror.ts` to `.qm`
+- Linux: `./simple-mirror`
+- Windows output: `dist/simple-mirror.exe`
+
+Targets:
+
+- `make run`: build and run
+- `make clean`: remove objects, binary, compiled `.qm`
+- `make translations`: compile `resources/locales/<lang>/LC_MESSAGES/simple-mirror.ts` to `.qm`
 - `make bundle-rsync`: download and bundle MSYS2 `rsync` into `runtime/msys2`
-- `make clean-bundle`: remove bundled MSYS2 rsync files and cache
-- `make bundle-runtime`: copy shared library dependencies next to `simple-mirror`, copy Qt platform plugins to `plugins/platforms`, and write `qt.conf`
-- `make clean-runtime`: remove files copied by `bundle-runtime`
-- `make deploy-windows`: on Windows, create `dist/` with `simple-mirror.exe`, MinGW runtime DLLs, Qt runtime via `windeployqt`, locales, and bundled rsync (if available)
+- `make clean-bundle`: remove bundled rsync and cache
+- `make bundle-runtime`: Linux-only runtime bundling (shared libs + Qt plugins + `qt.conf` next to executable)
+- `make clean-runtime`: remove files created by `bundle-runtime`
+- `make deploy-windows`: create `dist/` with `simple-mirror.exe`, MinGW runtime DLLs, Qt runtime via `windeployqt`, locales, and bundled rsync if present
 - `make clean-windows-deploy`: remove `dist/`
 
-## Translations (Qt)
+## Translations
 
-English is the default UI language. At startup, the app loads a translation based on the system locale if a matching `.qm` file exists in `resources/locales/<lang>/LC_MESSAGES`.
+Default language is English
+At startup, system locale is used if `resources/locales/<lang>/LC_MESSAGES/simple-mirror.qm` exists
 
-Included translation files:
+Included: `de`, `es`, `pt`, `it`, `nl`, `fr`, `zh_CN`, `ja`
 
-- German (`de`)
-- Spanish (`es`)
-- Portuguese (`pt`)
-- Italian (`it`)
-- Dutch (`nl`)
-- French (`fr`)
-- Chinese Simplified (`zh_CN`)
-- Japanese (`ja`)
+## Windows rsync resolution
 
-## Windows rsync routine (Qt app)
+`rsync` is resolved in this order (relative to executable directory and current working directory):
 
-For `simple-mirror`, rsync is discovered in this order
-(checked relative to both the executable directory and current working directory):
-
-1. `SIMPLE_MIRROR_RSYNC` environment variable
-2. Bundled paths in the working directory:
+1. `SIMPLE_MIRROR_RSYNC`
+2. Bundled paths:
    - `runtime/msys2/usr/bin/rsync.exe`
    - `runtime/bin/rsync.exe`
    - `msys2/usr/bin/rsync.exe`
    - `bin/rsync.exe`
 3. `PATH` (`rsync.exe`, then `rsync`)
 
-By default, normal compilation is separate from rsync bundling:
+Rsync bundling is separate from normal build:
 
-```bash
-make
-```
+- default: `make`
+- explicit bundle: `make bundle-rsync`
+- build + bundle: `make BUNDLE_RSYNC=1`
 
-Bundle rsync explicitly:
-
-```bash
-make bundle-rsync
-```
-
-Or include rsync bundling in the same build command:
-
-```bash
-make BUNDLE_RSYNC=1
-```
-
-To prepare a runnable package outside MSYS2, run:
+For runnable packaging outside MSYS2 on Windows:
 
 ```bash
 make deploy-windows
 ```
 
-On non-Windows systems, you can still generate the bundle explicitly:
-
-```bash
-make bundle-rsync
-```
-
-On Windows builds, selected folder paths are converted to MSYS/Cygwin style
-(for example `C:\Data\Backup\` becomes `/c/Data/Backup/`) before invoking rsync.
+On Windows, selected folder paths are converted to MSYS/Cygwin format before rsync call, example: `C:\Data\Backup\` -> `/c/Data/Backup/`

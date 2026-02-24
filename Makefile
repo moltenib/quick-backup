@@ -25,10 +25,11 @@ WIN_RUNTIME_DLLS := libgcc_s_seh-1.dll libstdc++-6.dll libwinpthread-1.dll
 BUNDLE_RSYNC ?= 0
 ifeq ($(OS),Windows_NT)
 EXE_SUFFIX := .exe
-BIN := $(ROOT_DIR)/simple-mirror$(EXE_SUFFIX)
+BIN := $(WIN_DEPLOY_DIR)/simple-mirror$(EXE_SUFFIX)
 else
 LDFLAGS += -Wl,-rpath,'$$ORIGIN'
 endif
+BIN_DIR := $(dir $(BIN))
 
 ALL_TARGETS := $(BIN)
 ifeq ($(BUNDLE_RSYNC),1)
@@ -44,6 +45,7 @@ endif
 all: $(ALL_TARGETS) translations
 
 $(BIN): $(OBJ)
+	@mkdir -p "$(dir $@)"
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(OBJ) $(QT_LIBS)
 
 src/%.o: src/%.cpp
@@ -64,12 +66,18 @@ ifeq ($(OS),Windows_NT)
 	@set -eu; \
 	exe_name="$$(basename "$(BIN)")"; \
 	mkdir -p "$(WIN_DEPLOY_DIR)"; \
-	cp -f "$(BIN)" "$(WIN_DEPLOY_DIR)/$$exe_name"; \
+	if [ "$(BIN)" != "$(ROOT_DIR)/$$exe_name" ] && [ -f "$(ROOT_DIR)/$$exe_name" ]; then \
+		rm -f "$(ROOT_DIR)/$$exe_name"; \
+	fi; \
 	for dll in $(WIN_RUNTIME_DLLS); do \
-		if [ -f "$(WIN_MINGW_BIN)$$dll" ]; then \
-			cp -f "$(WIN_MINGW_BIN)$$dll" "$(WIN_DEPLOY_DIR)/"; \
+		dll_path="$$( $(CXX) -print-file-name=$$dll 2>/dev/null || true )"; \
+		if [ "$$dll_path" = "$$dll" ] || [ ! -f "$$dll_path" ]; then \
+			dll_path="$(WIN_MINGW_BIN)$$dll"; \
+		fi; \
+		if [ -f "$$dll_path" ]; then \
+			cp -f "$$dll_path" "$(WIN_DEPLOY_DIR)/"; \
 		else \
-			echo "Warning: $(WIN_MINGW_BIN)$$dll not found"; \
+			echo "Warning: $$dll not found"; \
 		fi; \
 	done; \
 	mkdir -p "$(WIN_DEPLOY_DIR)/resources"; \
@@ -79,9 +87,9 @@ ifeq ($(OS),Windows_NT)
 		cp -f "$(MSYS2_RSYNC_EXE)" "$(WIN_DEPLOY_DIR)/runtime/msys2/usr/bin/"; \
 	fi; \
 	if command -v "$(WINDEPLOYQT)" >/dev/null 2>&1; then \
-		"$(WINDEPLOYQT)" --release --no-translations --no-quick-import "$(WIN_DEPLOY_DIR)/$$exe_name"; \
+		"$(WINDEPLOYQT)" --release --no-translations --no-quick-import "$(BIN)"; \
 	elif command -v windeployqt >/dev/null 2>&1; then \
-		windeployqt --release --no-translations --no-quick-import "$(WIN_DEPLOY_DIR)/$$exe_name"; \
+		windeployqt --release --no-translations --no-quick-import "$(BIN)"; \
 	else \
 		echo "Warning: windeployqt not found, Qt runtime was not auto-copied"; \
 	fi; \
@@ -92,6 +100,10 @@ else
 endif
 
 bundle-runtime: $(BIN)
+ifeq ($(OS),Windows_NT)
+	@echo "bundle-runtime is Linux-only. Use deploy-windows on Windows."
+	@exit 1
+else
 	@set -eu; \
 	command -v ldd >/dev/null 2>&1 || { echo "bundle-runtime requires ldd"; exit 1; }; \
 	: > "$(RUNTIME_MANIFEST)"; \
@@ -105,7 +117,7 @@ bundle-runtime: $(BIN)
 				[ -f "$$lib" ] || continue; \
 				base="$$(basename "$$lib")"; \
 				case "$$base" in linux-vdso.so*|ld-linux*.so*|ld-musl-*.so*) continue ;; esac; \
-				dest="$(ROOT_DIR)/$$base"; \
+				dest="$(BIN_DIR)$$base"; \
 				echo "$$dest" >> "$(RUNTIME_MANIFEST)"; \
 				if [ ! -e "$$dest" ]; then \
 					cp -L "$$lib" "$$dest"; \
@@ -117,15 +129,16 @@ bundle-runtime: $(BIN)
 	if [ -z "$$qt_plugin_dir" ]; then qt_plugin_dir="$$(qtpaths --plugin-dir 2>/dev/null || true)"; fi; \
 	if [ -z "$$qt_plugin_dir" ]; then qt_plugin_dir="$$(pkg-config --variable=pluginsdir Qt6Core 2>/dev/null || true)"; fi; \
 	if [ -n "$$qt_plugin_dir" ] && [ -d "$$qt_plugin_dir/platforms" ]; then \
-		mkdir -p "$(ROOT_DIR)/plugins"; \
-		cp -a "$$qt_plugin_dir/platforms" "$(ROOT_DIR)/plugins/"; \
-		find "$(ROOT_DIR)/plugins/platforms" -type f -name '*.so*' | while read -r plugin; do \
+		mkdir -p "$(BIN_DIR)plugins"; \
+		cp -a "$$qt_plugin_dir/platforms" "$(BIN_DIR)plugins/"; \
+		find "$(BIN_DIR)plugins/platforms" -type f -name '*.so*' | while read -r plugin; do \
 			copy_deps "$$plugin"; \
 		done; \
 	fi; \
 	sort -u "$(RUNTIME_MANIFEST)" -o "$(RUNTIME_MANIFEST)"; \
-	printf '[Paths]\nPlugins = plugins\n' > "$(ROOT_DIR)/qt.conf"; \
+	printf '[Paths]\nPlugins = plugins\n' > "$(BIN_DIR)qt.conf"; \
 	echo "Runtime dependencies copied next to $(BIN)"
+endif
 
 run: $(BIN)
 	$(BIN)
@@ -142,5 +155,5 @@ clean-windows-deploy:
 
 clean-runtime:
 	if [ -f "$(RUNTIME_MANIFEST)" ]; then xargs -r rm -f < "$(RUNTIME_MANIFEST)"; fi
-	rm -f "$(RUNTIME_MANIFEST)" qt.conf
-	rm -rf plugins
+	rm -f "$(RUNTIME_MANIFEST)" "$(BIN_DIR)qt.conf"
+	rm -rf "$(BIN_DIR)plugins"

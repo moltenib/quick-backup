@@ -69,10 +69,22 @@ For `simple-mirror`, rsync is discovered in this order
    - `bin/rsync.exe`
 3. `PATH` (`rsync.exe`, then `rsync`)
 
-On Windows, `make` automatically runs the rsync bundle step unless you disable it:
+By default, normal compilation is separate from rsync bundling:
 
 ```bash
-make BUNDLE_RSYNC=0
+make
+```
+
+Bundle rsync explicitly:
+
+```bash
+make bundle-rsync
+```
+
+Or include rsync bundling in the same build command:
+
+```bash
+make BUNDLE_RSYNC=1
 ```
 
 To prepare a runnable package outside MSYS2, run:

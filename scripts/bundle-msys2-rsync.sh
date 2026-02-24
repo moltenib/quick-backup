@@ -8,6 +8,7 @@ DB_FILE="${CACHE_DIR}/msys.db"
 DB_DIR="${CACHE_DIR}/db"
 PKG_CACHE_DIR="${CACHE_DIR}/pkgs"
 BUNDLE_DIR="${ROOT_DIR}/runtime/msys2"
+REFRESH_PACKAGE_INDEX="${REFRESH_PACKAGE_INDEX:-0}"
 
 shopt -s nullglob
 
@@ -39,8 +40,12 @@ normalize_dep_name() {
 
 mkdir -p "${CACHE_DIR}" "${PKG_CACHE_DIR}" "${BUNDLE_DIR}"
 
-echo "Fetching MSYS2 package index..."
-curl -fsSL "${REPO_URL}/msys.db" -o "${DB_FILE}"
+if [[ ! -f "${DB_FILE}" || "${REFRESH_PACKAGE_INDEX}" == "1" ]]; then
+    echo "Fetching MSYS2 package index..."
+    curl -fsSL "${REPO_URL}/msys.db" -o "${DB_FILE}"
+else
+    echo "Using cached MSYS2 package index: ${DB_FILE}"
+fi
 
 rm -rf "${DB_DIR}"
 mkdir -p "${DB_DIR}"

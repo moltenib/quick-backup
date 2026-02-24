@@ -26,7 +26,6 @@ BUNDLE_RSYNC ?= 0
 ifeq ($(OS),Windows_NT)
 EXE_SUFFIX := .exe
 BIN := $(ROOT_DIR)/simple-mirror$(EXE_SUFFIX)
-BUNDLE_RSYNC := 1
 else
 LDFLAGS += -Wl,-rpath,'$$ORIGIN'
 endif

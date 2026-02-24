@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QCoreApplication>
 #include <QWidget>
 
 class QLabel;
@@ -8,6 +9,9 @@ class QPushButton;
 
 class DirectoryChooserWidget : public QWidget {
 public:
+    Q_DECLARE_TR_FUNCTIONS(DirectoryChooserWidget);
+public:
+
     DirectoryChooserWidget(
         const QString& label_text,
         const QString& placeholder_text,

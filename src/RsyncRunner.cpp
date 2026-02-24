@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include <QCoreApplication>
 #include <QDir>
 #include <QFileInfo>
 #include <QProcess>
@@ -63,7 +64,10 @@ bool RsyncRunner::ensure_rsync_available(std::string& error) {
 
 bool RsyncRunner::start(const std::string& origin, const std::string& destination, std::string& error) {
     if (running_) {
-        error = "A synchronization is already running.";
+        error = QCoreApplication::translate(
+                    "RsyncRunner",
+                    "A synchronization is already running.")
+                    .toStdString();
         return false;
     }
 
@@ -89,7 +93,7 @@ bool RsyncRunner::start(const std::string& origin, const std::string& destinatio
     return true;
 }
 
-void RsyncRunner::cancel() {
+void RsyncRunner::stop() {
     if (!running_) {
         return;
     }
@@ -113,22 +117,33 @@ bool RsyncRunner::resolve_rsync_executable(std::string& error) {
             rsync_executable_ = env_file.absoluteFilePath().toStdString();
             return true;
         }
-        error = "QUICK_BACKUP_RSYNC is set but does not point to a valid file: " +
-                env_value.toStdString();
+        error = QCoreApplication::translate(
+                    "RsyncRunner",
+                    "QUICK_BACKUP_RSYNC is set but does not point to a valid file: %1")
+                    .arg(env_value)
+                    .toStdString();
         return false;
     }
 
     const QString cwd = QDir::currentPath();
+    const QString app_dir = QCoreApplication::applicationDirPath();
     std::vector<QString> candidates;
 #ifdef _WIN32
     candidates = {
+        QDir(app_dir).filePath("runtime/msys2/usr/bin/rsync.exe"),
+        QDir(cwd).filePath("runtime/msys2/usr/bin/rsync.exe"),
+        QDir(app_dir).filePath("runtime/bin/rsync.exe"),
         QDir(cwd).filePath("runtime/bin/rsync.exe"),
+        QDir(app_dir).filePath("msys2/usr/bin/rsync.exe"),
         QDir(cwd).filePath("msys2/usr/bin/rsync.exe"),
+        QDir(app_dir).filePath("bin/rsync.exe"),
         QDir(cwd).filePath("bin/rsync.exe"),
     };
 #else
     candidates = {
+        QDir(app_dir).filePath("runtime/bin/rsync"),
         QDir(cwd).filePath("runtime/bin/rsync"),
+        QDir(app_dir).filePath("bin/rsync"),
         QDir(cwd).filePath("bin/rsync"),
     };
 #endif
@@ -155,8 +170,11 @@ bool RsyncRunner::resolve_rsync_executable(std::string& error) {
         return true;
     }
 
-    error = "Could not find rsync. Set QUICK_BACKUP_RSYNC, add rsync to PATH, or bundle "
-            "\"runtime/bin/rsync\" (or \"runtime/bin/rsync.exe\" on Windows).";
+    error = QCoreApplication::translate(
+                "RsyncRunner",
+                "Could not find rsync. Set QUICK_BACKUP_RSYNC, add rsync to PATH, or bundle "
+                "\"runtime/bin/rsync\" on Linux, or \"runtime/msys2/usr/bin/rsync.exe\" on Windows.")
+                .toStdString();
     return false;
 }
 

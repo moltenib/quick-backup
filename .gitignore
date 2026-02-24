@@ -1,2 +1,6 @@
 quick-backup*
+simple-mirror*
 *.o
+.cache/
+runtime/
+i18n/qm/*.qm

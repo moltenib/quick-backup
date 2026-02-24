@@ -21,7 +21,7 @@ DirectoryChooserWidget::DirectoryChooserWidget(
       chooser_title_(chooser_title),
       label_(new QLabel(label_text, this)),
       path_edit_(new QLineEdit(this)),
-      browse_button_(new QPushButton("Select", this)) {
+      browse_button_(new QPushButton(tr("Select"), this)) {
     label_->setObjectName(label_object_name);
     path_edit_->setObjectName(line_edit_object_name);
     path_edit_->setReadOnly(true);

@@ -118,9 +118,9 @@ MainWindow::MainWindow(const std::string& icon_name)
       output_view_(nullptr),
       progress_bar_(nullptr),
       last_progress_percent_(-1),
-      cancel_requested_(false) {
+      stop_requested_(false) {
     setObjectName("main-window");
-    setWindowTitle("Quick Back-Up");
+    setWindowTitle(tr("Simple Mirror"));
     setMinimumSize(800, 600);
     resize(800, 600);
 
@@ -147,17 +147,17 @@ MainWindow::MainWindow(const std::string& icon_name)
     directory_column->setSpacing(6);
 
     origin_chooser_ = new DirectoryChooserWidget(
-        "Origin:",
-        "The folder to be backed up.",
-        "Select origin folder",
+        tr("Origin:"),
+        tr("The folder to be backed up."),
+        tr("Select origin folder"),
         "origin-label",
         "origin-edit",
         "browse-origin",
         central);
     destination_chooser_ = new DirectoryChooserWidget(
-        "Destination:",
-        "A folder inside a back-up medium.",
-        "Select destination folder",
+        tr("Destination:"),
+        tr("A folder inside a back-up medium."),
+        tr("Select destination folder"),
         "destination-label",
         "destination-edit",
         "browse-destination",
@@ -166,13 +166,15 @@ MainWindow::MainWindow(const std::string& icon_name)
     directory_column->addWidget(origin_chooser_);
     directory_column->addWidget(destination_chooser_);
 
-    sync_button_ = new QPushButton("Synchronize", central);
+    sync_button_ = new QPushButton(tr("Synchronize"), central);
     sync_button_->setObjectName("sync-button");
     sync_button_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     const QFontMetrics metrics(sync_button_->font());
+    const QString synchronize_text = tr("Synchronize");
+    const QString stop_text = tr("Stop");
     const int min_button_width = std::max(
-                                     metrics.horizontalAdvance("Synchronize"),
-                                     metrics.horizontalAdvance("Cancel")) +
+                                     metrics.horizontalAdvance(synchronize_text),
+                                     metrics.horizontalAdvance(stop_text)) +
                                  32;
     sync_button_->setMinimumWidth(min_button_width);
 
@@ -193,7 +195,7 @@ MainWindow::MainWindow(const std::string& icon_name)
     progress_bar_->setObjectName("progress-bar");
     progress_bar_->setRange(0, 100);
     progress_bar_->setValue(0);
-    progress_bar_->setFormat("Idle");
+    progress_bar_->setFormat(tr("Idle"));
 
     main_layout->addLayout(top_row);
     main_layout->addWidget(output_view_, 1);
@@ -213,20 +215,20 @@ MainWindow::MainWindow(const std::string& icon_name)
         progress_bar_->setFormat(QString::fromStdString(progress_line));
     });
     runner_.set_finished_callback([this](int exit_code, bool signaled) {
-        if (cancel_requested_) {
-            progress_bar_->setFormat("Cancelled");
+        if (stop_requested_) {
+            progress_bar_->setFormat(tr("Stopped"));
         } else if (signaled) {
-            progress_bar_->setFormat("Cancelled");
+            progress_bar_->setFormat(tr("Stopped"));
         } else if (exit_code == 0) {
             progress_bar_->setValue(100);
-            progress_bar_->setFormat("Done");
+            progress_bar_->setFormat(tr("Done"));
         } else {
-            progress_bar_->setFormat("Failed");
+            progress_bar_->setFormat(tr("Failed"));
             show_error(
-                "Synchronization failed with exit code " + std::to_string(exit_code) + ".",
-                "Synchronization failed");
+                tr("Synchronization failed with exit code %1.").arg(exit_code),
+                tr("Synchronization failed"));
         }
-        cancel_requested_ = false;
+        stop_requested_ = false;
         set_running_state(false);
     });
 }
@@ -236,7 +238,7 @@ MainWindow::~MainWindow() {
     runner_.set_progress_callback(nullptr);
     runner_.set_finished_callback(nullptr);
     if (runner_.is_running()) {
-        runner_.cancel();
+        runner_.stop();
     }
 }
 
@@ -251,22 +253,22 @@ void MainWindow::append_output(const std::string& text) {
 }
 
 void MainWindow::set_running_state(bool running) {
-    sync_button_->setText(running ? "Cancel" : "Synchronize");
+    sync_button_->setText(running ? tr("Stop") : tr("Synchronize"));
     origin_chooser_->setChooserEnabled(!running);
     destination_chooser_->setChooserEnabled(!running);
 
     if (running) {
         last_progress_percent_ = -1;
         progress_bar_->setValue(0);
-        progress_bar_->setFormat("Running...");
+        progress_bar_->setFormat(tr("Running..."));
     }
 }
 
 void MainWindow::on_sync_clicked() {
     if (runner_.is_running()) {
-        cancel_requested_ = true;
-        runner_.cancel();
-        progress_bar_->setFormat("Stopping...");
+        stop_requested_ = true;
+        runner_.stop();
+        progress_bar_->setFormat(tr("Stopping..."));
         return;
     }
 
@@ -278,7 +280,7 @@ void MainWindow::on_sync_clicked() {
 
     std::string rsync_error;
     if (!runner_.ensure_rsync_available(rsync_error)) {
-        show_error(rsync_error, "rsync not found");
+        show_error(QString::fromStdString(rsync_error), tr("rsync not found"));
         return;
     }
 
@@ -287,7 +289,7 @@ void MainWindow::on_sync_clicked() {
     }
 
     output_view_->clear();
-    cancel_requested_ = false;
+    stop_requested_ = false;
     set_running_state(true);
     append_output(
         "$ rsync -av --info=progress2 --delete \"" + origin + "\" \"" +
@@ -296,21 +298,23 @@ void MainWindow::on_sync_clicked() {
     std::string start_error;
     if (!runner_.start(origin, destination, start_error)) {
         set_running_state(false);
-        progress_bar_->setFormat("Error");
-        append_output("Error: " + start_error + "\n");
-        show_error(start_error, "Synchronization error");
+        progress_bar_->setFormat(tr("Error"));
+        append_output(tr("Error: %1\n").arg(QString::fromStdString(start_error)).toStdString());
+        show_error(QString::fromStdString(start_error), tr("Synchronization error"));
     }
 }
 
 bool MainWindow::confirm_synchronize() {
     QMessageBox dialog(this);
-    dialog.setWindowTitle("Notice");
+    dialog.setWindowTitle(tr("Notice"));
     dialog.setIcon(QMessageBox::Warning);
-    dialog.setText("Any files in the destination folder that do not exist in the origin will be deleted.");
-    dialog.setInformativeText("This is to keep the destination folder up to date. Continue?");
-    dialog.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-    dialog.setDefaultButton(QMessageBox::Cancel);
-    return dialog.exec() == QMessageBox::Ok;
+    dialog.setText(tr("Any files in the destination folder that do not exist in the origin will be deleted."));
+    dialog.setInformativeText(tr("This is to keep the destination folder up to date. Continue?"));
+    QPushButton* ok_button = dialog.addButton(QMessageBox::Ok);
+    QPushButton* stop_button = dialog.addButton(tr("Stop"), QMessageBox::RejectRole);
+    dialog.setDefaultButton(stop_button);
+    dialog.exec();
+    return dialog.clickedButton() == ok_button;
 }
 
 bool MainWindow::validate_inputs(std::string& origin, std::string& destination) {
@@ -318,17 +322,17 @@ bool MainWindow::validate_inputs(std::string& origin, std::string& destination) 
     destination = destination_chooser_->path().toStdString();
 
     if (origin.empty() || destination.empty()) {
-        show_error("Please choose both origin and destination folders.");
+        show_error(tr("Please choose both origin and destination folders."));
         return false;
     }
 
     if (!std::filesystem::is_directory(origin)) {
-        show_error("Origin folder does not exist: " + origin);
+        show_error(tr("Origin folder does not exist: %1").arg(QString::fromStdString(origin)));
         return false;
     }
 
     if (!std::filesystem::is_directory(destination)) {
-        show_error("Destination folder does not exist: " + destination);
+        show_error(tr("Destination folder does not exist: %1").arg(QString::fromStdString(destination)));
         return false;
     }
 
@@ -342,9 +346,9 @@ bool MainWindow::validate_inputs(std::string& origin, std::string& destination) 
     return true;
 }
 
-void MainWindow::show_error(const std::string& message, const std::string& title) {
+void MainWindow::show_error(const QString& message, const QString& title) {
     QMessageBox::critical(
         this,
-        QString::fromStdString(title),
-        QString::fromStdString(message));
+        title.isEmpty() ? tr("Error") : title,
+        message);
 }

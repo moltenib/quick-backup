@@ -21,7 +21,7 @@ public:
 
     bool ensure_rsync_available(std::string& error);
     bool start(const std::string& origin, const std::string& destination, std::string& error);
-    void cancel();
+    void stop();
     bool is_running() const;
 
 private:

@@ -25,6 +25,10 @@ InstallDir "$PROGRAMFILES64\Simple Mirror"
 InstallDirRegKey HKLM "Software\Simple Mirror" "Install_Dir"
 
 !define MUI_ABORTWARNING
+!if /FileExists "..\resources\icons\icon.ico"
+!define MUI_ICON "..\resources\icons\icon.ico"
+!define MUI_UNICON "..\resources\icons\icon.ico"
+!endif
 
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "..\LICENSE"
@@ -69,8 +73,14 @@ Section "Install" SecInstall
     WriteRegDWORD HKLM "${UNINSTALL_KEY}" "NoRepair" 1
 
     CreateDirectory "$SMPROGRAMS\Simple Mirror"
+    IfFileExists "$INSTDIR\resources\icons\icon.ico" 0 +3
+    CreateShortcut "$SMPROGRAMS\Simple Mirror\Simple Mirror.lnk" "$INSTDIR\${APP_EXE}" "" "$INSTDIR\resources\icons\icon.ico" 0
+    Goto +2
     CreateShortcut "$SMPROGRAMS\Simple Mirror\Simple Mirror.lnk" "$INSTDIR\${APP_EXE}"
     CreateShortcut "$SMPROGRAMS\Simple Mirror\Uninstall Simple Mirror.lnk" "$INSTDIR\Uninstall.exe"
+    IfFileExists "$INSTDIR\resources\icons\icon.ico" 0 +3
+    CreateShortcut "$DESKTOP\Simple Mirror.lnk" "$INSTDIR\${APP_EXE}" "" "$INSTDIR\resources\icons\icon.ico" 0
+    Goto +2
     CreateShortcut "$DESKTOP\Simple Mirror.lnk" "$INSTDIR\${APP_EXE}"
 SectionEnd
 

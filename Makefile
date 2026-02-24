@@ -1,6 +1,7 @@
 CXX := g++
 CXXFLAGS := -std=c++17 -Wall -Wextra -pedantic -fPIC -Isrc
 LDFLAGS :=
+WINDRES ?= windres
 PKG_CONFIG := pkg-config
 QT_CFLAGS := $(shell $(PKG_CONFIG) --cflags Qt6Widgets)
 QT_LIBS := $(shell $(PKG_CONFIG) --libs Qt6Widgets)
@@ -19,6 +20,9 @@ WIN_DLL_COLLECT_SCRIPT := scripts/collect-win-dlls.sh
 MSYS2_RSYNC_EXE := runtime/msys2/usr/bin/rsync.exe
 RUNTIME_MANIFEST := $(ROOT_DIR)/.runtime-libs-manifest
 WIN_DEPLOY_DIR := $(ROOT_DIR)/dist
+WIN_ICON_ICO := resources/icons/icon.ico
+WIN_ICON_RC := resources/icons/app-icon.rc
+WIN_ICON_OBJ := resources/icons/app-icon.o
 WINDEPLOYQT ?= windeployqt6
 WIN_MINGW_BIN := $(dir $(shell command -v $(CXX) 2>/dev/null))
 NSIS ?= makensis
@@ -30,6 +34,9 @@ ifeq ($(OS),Windows_NT)
 EXE_SUFFIX := .exe
 BIN := $(WIN_DEPLOY_DIR)/simple-mirror$(EXE_SUFFIX)
 LDFLAGS += -mwindows
+ifneq ($(wildcard $(WIN_ICON_ICO)),)
+OBJ += $(WIN_ICON_OBJ)
+endif
 else
 LDFLAGS += -Wl,-rpath,'$$ORIGIN'
 endif
@@ -44,7 +51,7 @@ ifeq ($(BUNDLE_RSYNC),1)
 DEPLOY_WINDOWS_DEPS += $(MSYS2_RSYNC_EXE)
 endif
 
-.PHONY: all run clean bundle-rsync clean-bundle bundle-runtime clean-runtime deploy-windows clean-windows-deploy translations installer-windows
+.PHONY: all run clean clean-all windows-all bundle-rsync clean-bundle bundle-runtime clean-runtime deploy-windows clean-windows-deploy translations installer-windows
 
 all: $(ALL_TARGETS) translations
 
@@ -54,6 +61,9 @@ $(BIN): $(OBJ)
 
 src/%.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) $(QT_CFLAGS) -c $< -o $@
+
+$(WIN_ICON_OBJ): $(WIN_ICON_RC) $(WIN_ICON_ICO)
+	$(WINDRES) -i $(WIN_ICON_RC) -o $@
 
 translations: $(QM_FILES)
 
@@ -77,6 +87,7 @@ ifeq ($(OS),Windows_NT)
 	fi; \
 	mkdir -p "$(WIN_DEPLOY_DIR)/resources"; \
 	cp -a resources/locales "$(WIN_DEPLOY_DIR)/resources/"; \
+	cp -a resources/icons "$(WIN_DEPLOY_DIR)/resources/"; \
 	if [ -f "$(MSYS2_RSYNC_EXE)" ]; then \
 		mkdir -p "$(WIN_DEPLOY_DIR)/runtime/msys2/usr/bin"; \
 		cp -f "$(MSYS2_RSYNC_EXE)" "$(WIN_DEPLOY_DIR)/runtime/msys2/usr/bin/"; \
@@ -106,6 +117,15 @@ ifeq ($(OS),Windows_NT)
 	@echo "NSIS installer created: $(ROOT_DIR)/simple-mirror-setup-$(APP_VERSION).exe"
 else
 	@echo "installer-windows is only available when OS=Windows_NT"
+	@exit 1
+endif
+
+windows-all:
+ifeq ($(OS),Windows_NT)
+	$(MAKE) clean-all
+	$(MAKE) BUNDLE_RSYNC=1 installer-windows
+else
+	@echo "windows-all is only available when OS=Windows_NT"
 	@exit 1
 endif
 
@@ -155,7 +175,11 @@ run: $(BIN)
 
 clean:
 	find src -name '*.o' -delete
+	rm -f "$(WIN_ICON_OBJ)"
 	rm -f $(BIN) $(QM_FILES)
+
+clean-all: clean clean-runtime clean-bundle clean-windows-deploy
+	rm -f "$(ROOT_DIR)"/simple-mirror-setup-*.exe
 
 clean-bundle:
 	rm -rf runtime/msys2 .cache/msys2

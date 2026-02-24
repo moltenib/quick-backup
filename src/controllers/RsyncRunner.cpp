@@ -9,6 +9,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QProcess>
+#include <QProcessEnvironment>
 #include <QStandardPaths>
 #include <QTimer>
 
@@ -79,7 +80,11 @@ bool RsyncRunner::start(const std::string& origin, const std::string& destinatio
          << QString::fromStdString(normalize_rsync_path(origin))
          << QString::fromStdString(normalize_rsync_path(destination));
 
-    process_.start(QString::fromStdString(rsync_executable_), args);
+    const QString rsync_path = QString::fromStdString(rsync_executable_);
+#ifdef _WIN32
+    configure_windows_process_environment(rsync_path);
+#endif
+    process_.start(rsync_path, args);
     if (!process_.waitForStarted()) {
         error = process_.errorString().toStdString();
         return false;
@@ -107,6 +112,31 @@ bool RsyncRunner::is_running() const {
 
 bool RsyncRunner::resolve_rsync_executable(std::string& error) {
     const QString env_value = qEnvironmentVariable("SIMPLE_MIRROR_RSYNC").trimmed();
+#ifdef _WIN32
+    if (!env_value.isEmpty()) {
+        QFileInfo env_file(env_value);
+        if (env_file.exists() && env_file.isFile()) {
+            const QString env_path = env_file.absoluteFilePath();
+            if (has_msys2_runtime(env_path)) {
+                rsync_executable_ = env_path.toStdString();
+                return true;
+            }
+            error = QCoreApplication::translate(
+                        "RsyncRunner",
+                        "SIMPLE_MIRROR_RSYNC points to rsync but MSYS2 runtime is missing "
+                        "(msys-2.0.dll not found near rsync, app directory, or working directory): %1")
+                        .arg(env_path)
+                        .toStdString();
+            return false;
+        }
+        error = QCoreApplication::translate(
+                    "RsyncRunner",
+                    "SIMPLE_MIRROR_RSYNC is set but does not point to a valid file: %1")
+                    .arg(env_value)
+                    .toStdString();
+        return false;
+    }
+#else
     if (!env_value.isEmpty()) {
         QFileInfo env_file(env_value);
         if (env_file.exists() && env_file.isFile()) {
@@ -120,6 +150,7 @@ bool RsyncRunner::resolve_rsync_executable(std::string& error) {
                     .toStdString();
         return false;
     }
+#endif
 
     const QString cwd = QDir::currentPath();
     const QString app_dir = QCoreApplication::applicationDirPath();
@@ -128,12 +159,8 @@ bool RsyncRunner::resolve_rsync_executable(std::string& error) {
     candidates = {
         QDir(app_dir).filePath("runtime/msys2/usr/bin/rsync.exe"),
         QDir(cwd).filePath("runtime/msys2/usr/bin/rsync.exe"),
-        QDir(app_dir).filePath("runtime/bin/rsync.exe"),
-        QDir(cwd).filePath("runtime/bin/rsync.exe"),
         QDir(app_dir).filePath("msys2/usr/bin/rsync.exe"),
         QDir(cwd).filePath("msys2/usr/bin/rsync.exe"),
-        QDir(app_dir).filePath("bin/rsync.exe"),
-        QDir(cwd).filePath("bin/rsync.exe"),
     };
 #else
     candidates = {
@@ -147,32 +174,124 @@ bool RsyncRunner::resolve_rsync_executable(std::string& error) {
     for (const QString& candidate : candidates) {
         QFileInfo info(candidate);
         if (info.exists() && info.isFile()) {
-            rsync_executable_ = info.absoluteFilePath().toStdString();
+            const QString rsync_path = info.absoluteFilePath();
+#ifdef _WIN32
+            if (!has_msys2_runtime(rsync_path)) {
+                continue;
+            }
+#endif
+            rsync_executable_ = rsync_path.toStdString();
             return true;
         }
     }
 
 #ifdef _WIN32
-    QString from_path = QStandardPaths::findExecutable("rsync.exe");
-    if (from_path.isEmpty()) {
-        from_path = QStandardPaths::findExecutable("rsync");
+    const QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    const QString path_value = env.value("PATH");
+    const QStringList path_dirs = path_value.split(';', Qt::SkipEmptyParts);
+    for (const QString& path_dir : path_dirs) {
+        const QString rsync_exe = QDir(path_dir).filePath("rsync.exe");
+        QFileInfo exe_info(rsync_exe);
+        if (exe_info.exists() && exe_info.isFile() && has_msys2_runtime(exe_info.absoluteFilePath())) {
+            rsync_executable_ = exe_info.absoluteFilePath().toStdString();
+            return true;
+        }
+
+        const QString rsync_no_ext = QDir(path_dir).filePath("rsync");
+        QFileInfo no_ext_info(rsync_no_ext);
+        if (no_ext_info.exists() && no_ext_info.isFile() &&
+            has_msys2_runtime(no_ext_info.absoluteFilePath())) {
+            rsync_executable_ = no_ext_info.absoluteFilePath().toStdString();
+            return true;
+        }
     }
 #else
     const QString from_path = QStandardPaths::findExecutable("rsync");
-#endif
-
     if (!from_path.isEmpty()) {
         rsync_executable_ = from_path.toStdString();
         return true;
     }
+#endif
 
     error = QCoreApplication::translate(
                 "RsyncRunner",
-                "Could not find rsync. Set SIMPLE_MIRROR_RSYNC, add rsync to PATH, or bundle "
-                "\"runtime/bin/rsync\" on Linux, or \"runtime/msys2/usr/bin/rsync.exe\" on Windows.")
+                "Could not find rsync with a valid MSYS2 POSIX runtime. Set SIMPLE_MIRROR_RSYNC "
+                "to an MSYS2 rsync.exe, or bundle \"runtime/msys2/usr/bin/rsync.exe\" with "
+                "msys-2.0.dll on Windows.")
                 .toStdString();
     return false;
 }
+
+#ifdef _WIN32
+bool RsyncRunner::has_msys2_runtime(const QString& rsync_path) const {
+    const QFileInfo rsync_info(rsync_path);
+    if (!rsync_info.exists() || !rsync_info.isFile()) {
+        return false;
+    }
+
+    const QString app_dir = QCoreApplication::applicationDirPath();
+    const QString cwd = QDir::currentPath();
+    const QStringList runtime_dirs = {
+        rsync_info.absolutePath(),
+        app_dir,
+        cwd,
+        QDir(app_dir).filePath("runtime/msys2/usr/bin"),
+        QDir(cwd).filePath("runtime/msys2/usr/bin"),
+    };
+
+    for (const QString& runtime_dir : runtime_dirs) {
+        if (runtime_dir.isEmpty()) {
+            continue;
+        }
+        const QString runtime_dll = QDir(runtime_dir).filePath("msys-2.0.dll");
+        QFileInfo dll_info(runtime_dll);
+        if (dll_info.exists() && dll_info.isFile()) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void RsyncRunner::configure_windows_process_environment(const QString& rsync_path) {
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    const QString app_dir = QCoreApplication::applicationDirPath();
+    const QString cwd = QDir::currentPath();
+    const QStringList prepend_dirs = {
+        QFileInfo(rsync_path).absolutePath(),
+        QDir(app_dir).filePath("runtime/msys2/usr/bin"),
+        QDir(cwd).filePath("runtime/msys2/usr/bin"),
+        app_dir,
+        cwd,
+    };
+
+    QStringList path_entries;
+    for (const QString& dir : prepend_dirs) {
+        if (dir.isEmpty()) {
+            continue;
+        }
+        QFileInfo dir_info(dir);
+        if (!dir_info.exists() || !dir_info.isDir()) {
+            continue;
+        }
+        if (!path_entries.contains(dir, Qt::CaseInsensitive)) {
+            path_entries << dir;
+        }
+    }
+
+    const QString current_path = env.value("PATH");
+    for (const QString& dir : current_path.split(';', Qt::SkipEmptyParts)) {
+        if (!path_entries.contains(dir, Qt::CaseInsensitive)) {
+            path_entries << dir;
+        }
+    }
+
+    env.insert("PATH", path_entries.join(';'));
+    env.insert("MSYS2_PATH_TYPE", "inherit");
+    env.insert("CHERE_INVOKING", "1");
+    process_.setProcessEnvironment(env);
+}
+#endif
 
 std::string RsyncRunner::normalize_rsync_path(const std::string& path) const {
 #ifndef _WIN32

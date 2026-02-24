@@ -67,6 +67,15 @@ Outputs:
 - `dist/simple-mirror.exe`
 - `simple-mirror-setup-1.0.0.exe`
 
+## Icons
+
+- Runtime app icon uses bundled files first:
+  - `resources/icons/icon.png`
+  - `resources/icons/icon.ico`
+- `make deploy-windows` copies `resources/icons` into `dist/resources/icons`
+- Installer UI and shortcut icons use `resources/icons/icon.ico` when present
+- Windows executable icon embedding is enabled when `resources/icons/icon.ico` exists
+
 Run:
 
 - Linux: `./simple-mirror`
@@ -76,6 +85,7 @@ Targets:
 
 - `make run`: build and run
 - `make clean`: remove objects, binary, compiled `.qm`
+- `make clean-all`: full cleanup (`clean`, runtime bundle, MSYS2 bundle/cache, `dist`, installer `.exe`)
 - `make translations`: compile `resources/locales/<lang>/LC_MESSAGES/simple-mirror.ts` to `.qm`
 - `make bundle-rsync`: download and bundle MSYS2 `rsync` into `runtime/msys2`
 - `make clean-bundle`: remove bundled rsync and cache
@@ -83,6 +93,7 @@ Targets:
 - `make clean-runtime`: remove files created by `bundle-runtime`
 - `make deploy-windows`: create `dist/` with `simple-mirror.exe`, MinGW runtime DLLs, Qt runtime via `windeployqt`, locales, and bundled rsync if present
 - `make installer-windows`: run `deploy-windows` and build an NSIS installer (`simple-mirror-setup-<version>.exe`)
+- `make windows-all`: Windows full pipeline (`clean-all` + bundled rsync + deploy + installer)
 - `make clean-windows-deploy`: remove `dist/`
 
 ## Translations

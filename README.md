@@ -38,6 +38,8 @@ Useful targets:
 - `make clean-bundle`: remove bundled MSYS2 rsync files and cache
 - `make bundle-runtime`: copy shared library dependencies next to `simple-mirror`, copy Qt platform plugins to `plugins/platforms`, and write `qt.conf`
 - `make clean-runtime`: remove files copied by `bundle-runtime`
+- `make deploy-windows`: on Windows, create `dist/` with `simple-mirror.exe`, MinGW runtime DLLs, Qt runtime via `windeployqt`, locales, and bundled rsync (if available)
+- `make clean-windows-deploy`: remove `dist/`
 
 ## Translations (Qt)
 
@@ -71,6 +73,12 @@ On Windows, `make` automatically runs the rsync bundle step unless you disable i
 
 ```bash
 make BUNDLE_RSYNC=0
+```
+
+To prepare a runnable package outside MSYS2, run:
+
+```bash
+make deploy-windows
 ```
 
 On non-Windows systems, you can still generate the bundle explicitly:

@@ -3,4 +3,5 @@
 *.o
 .cache/
 runtime/
+dist/
 resources/locales/*/LC_MESSAGES/simple-mirror.qm

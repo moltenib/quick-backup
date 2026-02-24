@@ -28,9 +28,17 @@ WIN_MINGW_BIN := $(dir $(shell command -v $(CXX) 2>/dev/null))
 NSIS ?= makensis
 NSIS_SCRIPT := scripts/simple-mirror-installer.nsi
 APP_VERSION ?= 1.0.0
+UNAME_S := $(shell uname -s 2>/dev/null || echo)
+IS_WINDOWS := 0
+ifneq (,$(findstring Windows_NT,$(OS)))
+IS_WINDOWS := 1
+endif
+ifneq (,$(filter MSYS% MINGW% CYGWIN%,$(UNAME_S)))
+IS_WINDOWS := 1
+endif
 
 BUNDLE_RSYNC ?= 0
-ifeq ($(OS),Windows_NT)
+ifeq ($(IS_WINDOWS),1)
 EXE_SUFFIX := .exe
 BIN := $(WIN_DEPLOY_DIR)/simple-mirror$(EXE_SUFFIX)
 LDFLAGS += -mwindows
@@ -76,7 +84,7 @@ $(MSYS2_RSYNC_EXE): $(MSYS2_BUNDLE_SCRIPT)
 	$(MSYS2_BUNDLE_SCRIPT)
 
 deploy-windows: $(DEPLOY_WINDOWS_DEPS)
-ifeq ($(OS),Windows_NT)
+ifeq ($(IS_WINDOWS),1)
 	@set -eu; \
 	exe_name="$$(basename "$(BIN)")"; \
 	qt_bin_dir="$$(qtpaths6 --query QT_INSTALL_BINS 2>/dev/null || true)"; \
@@ -103,12 +111,12 @@ ifeq ($(OS),Windows_NT)
 	bash "$(WIN_DLL_COLLECT_SCRIPT)" "$(WIN_DEPLOY_DIR)" "$(WIN_MINGW_BIN)" "$$qt_bin_dir"; \
 	echo "Windows deployment is ready in $(WIN_DEPLOY_DIR)"
 else
-	@echo "deploy-windows is only available when OS=Windows_NT"
+	@echo "deploy-windows is only available in a Windows/MSYS2 environment"
 	@exit 1
 endif
 
 installer-windows: deploy-windows
-ifeq ($(OS),Windows_NT)
+ifeq ($(IS_WINDOWS),1)
 	@if ! command -v "$(NSIS)" >/dev/null 2>&1; then \
 		echo "installer-windows requires NSIS (makensis)"; \
 		exit 1; \
@@ -116,21 +124,21 @@ ifeq ($(OS),Windows_NT)
 	"$(NSIS)" -DAPP_VERSION="$(APP_VERSION)" "$(NSIS_SCRIPT)"
 	@echo "NSIS installer created: $(ROOT_DIR)/simple-mirror-setup-$(APP_VERSION).exe"
 else
-	@echo "installer-windows is only available when OS=Windows_NT"
+	@echo "installer-windows is only available in a Windows/MSYS2 environment"
 	@exit 1
 endif
 
 windows-all:
-ifeq ($(OS),Windows_NT)
+ifeq ($(IS_WINDOWS),1)
 	$(MAKE) clean-all
 	$(MAKE) BUNDLE_RSYNC=1 installer-windows
 else
-	@echo "windows-all is only available when OS=Windows_NT"
+	@echo "windows-all is only available in a Windows/MSYS2 environment"
 	@exit 1
 endif
 
 bundle-runtime: $(BIN)
-ifeq ($(OS),Windows_NT)
+ifeq ($(IS_WINDOWS),1)
 	@echo "bundle-runtime is Linux-only. Use deploy-windows on Windows."
 	@exit 1
 else

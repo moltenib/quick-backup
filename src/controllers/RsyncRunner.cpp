@@ -186,39 +186,28 @@ bool RsyncRunner::resolve_rsync_executable(std::string& error) {
     }
 
 #ifdef _WIN32
-    const QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    const QString path_value = env.value("PATH");
-    const QStringList path_dirs = path_value.split(';', Qt::SkipEmptyParts);
-    for (const QString& path_dir : path_dirs) {
-        const QString rsync_exe = QDir(path_dir).filePath("rsync.exe");
-        QFileInfo exe_info(rsync_exe);
-        if (exe_info.exists() && exe_info.isFile() && has_msys2_runtime(exe_info.absoluteFilePath())) {
-            rsync_executable_ = exe_info.absoluteFilePath().toStdString();
-            return true;
-        }
+    // On Windows require a bundled or explicitly configured MSYS2 rsync to avoid
+    // mixed runtime environments from random PATH entries.
+#endif
 
-        const QString rsync_no_ext = QDir(path_dir).filePath("rsync");
-        QFileInfo no_ext_info(rsync_no_ext);
-        if (no_ext_info.exists() && no_ext_info.isFile() &&
-            has_msys2_runtime(no_ext_info.absoluteFilePath())) {
-            rsync_executable_ = no_ext_info.absoluteFilePath().toStdString();
-            return true;
-        }
-    }
+#ifdef _WIN32
+    error = QCoreApplication::translate(
+                "RsyncRunner",
+                "Could not find bundled MSYS2 rsync. Use \"make BUNDLE_RSYNC=1 deploy-windows\", "
+                "or set SIMPLE_MIRROR_RSYNC to an MSYS2 rsync.exe.")
+                .toStdString();
 #else
     const QString from_path = QStandardPaths::findExecutable("rsync");
     if (!from_path.isEmpty()) {
         rsync_executable_ = from_path.toStdString();
         return true;
     }
-#endif
-
     error = QCoreApplication::translate(
                 "RsyncRunner",
-                "Could not find rsync with a valid MSYS2 POSIX runtime. Set SIMPLE_MIRROR_RSYNC "
-                "to an MSYS2 rsync.exe, or bundle \"runtime/msys2/usr/bin/rsync.exe\" with "
-                "msys-2.0.dll on Windows.")
+                "Could not find rsync. Set SIMPLE_MIRROR_RSYNC, add rsync to PATH, or bundle "
+                "\"runtime/bin/rsync\".")
                 .toStdString();
+#endif
     return false;
 }
 
@@ -287,9 +276,11 @@ void RsyncRunner::configure_windows_process_environment(const QString& rsync_pat
     }
 
     env.insert("PATH", path_entries.join(';'));
+    env.insert("MSYSTEM", "MSYS");
     env.insert("MSYS2_PATH_TYPE", "inherit");
     env.insert("CHERE_INVOKING", "1");
     process_.setProcessEnvironment(env);
+    process_.setWorkingDirectory(app_dir);
 }
 #endif
 

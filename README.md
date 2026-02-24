@@ -29,6 +29,7 @@ make
 ## Windows Build Sequence
 
 Use the `MSYS2 MinGW64` shell in the repo root
+No `OS=Windows_NT` override is needed
 
 Install dependencies once:
 
@@ -110,10 +111,10 @@ Included: `de`, `es`, `pt`, `it`, `nl`, `fr`, `zh_CN`, `ja`
 1. `SIMPLE_MIRROR_RSYNC`
 2. Bundled paths:
    - `runtime/msys2/usr/bin/rsync.exe`
-   - `runtime/bin/rsync.exe`
    - `msys2/usr/bin/rsync.exe`
-   - `bin/rsync.exe`
-3. `PATH` (`rsync.exe`, then `rsync`)
+
+On Windows, Simple Mirror requires an MSYS2-compatible `rsync` runtime (`msys-2.0.dll`)
+Random `PATH` rsync binaries are ignored to avoid mixed-runtime failures
 
 Rsync bundling is separate from normal build:
 
@@ -127,4 +128,4 @@ For runnable packaging outside MSYS2 on Windows:
 make deploy-windows
 ```
 
-On Windows, selected folder paths are converted to MSYS/Cygwin format before rsync call, example: `C:\Data\Backup\` -> `/c/Data/Backup/`
+On Windows, selected folder paths are converted to MSYS2 format before rsync call, example: `C:\Data\Backup\` -> `/c/Data/Backup/`

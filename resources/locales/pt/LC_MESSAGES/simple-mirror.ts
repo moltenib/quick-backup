@@ -59,12 +59,16 @@
         <translation>Parado</translation>
     </message>
     <message>
+        <source>The program has stopped. Press the button to resume.</source>
+        <translation>O programa foi interrompido. Prima o botão para retomar.</translation>
+    </message>
+    <message>
         <source>Done</source>
         <translation>Concluído</translation>
     </message>
     <message>
         <source>Mirroring complete.</source>
-        <translation>Espelhamento concluído.</translation>
+        <translation>Espelhamento finalizado.</translation>
     </message>
     <message>
         <source>Failed</source>

@@ -59,12 +59,16 @@
         <translation>停止済み</translation>
     </message>
     <message>
+        <source>The program has stopped. Press the button to resume.</source>
+        <translation>プログラムは停止しました。再開するにはボタンを押してください。</translation>
+    </message>
+    <message>
         <source>Done</source>
         <translation>完了</translation>
     </message>
     <message>
         <source>Mirroring complete.</source>
-        <translation>ミラーリングが完了しました。</translation>
+        <translation>ミラーリング処理が終了しました。</translation>
     </message>
     <message>
         <source>Failed</source>

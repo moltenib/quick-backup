@@ -59,12 +59,16 @@
         <translation>已停止</translation>
     </message>
     <message>
+        <source>The program has stopped. Press the button to resume.</source>
+        <translation>程序已停止。按下按钮以继续。</translation>
+    </message>
+    <message>
         <source>Done</source>
         <translation>完成</translation>
     </message>
     <message>
         <source>Mirroring complete.</source>
-        <translation>镜像完成。</translation>
+        <translation>镜像任务结束。</translation>
     </message>
     <message>
         <source>Failed</source>

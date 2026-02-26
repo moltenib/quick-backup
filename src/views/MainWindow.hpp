@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <string>
 
 #include <QCoreApplication>
@@ -43,6 +44,8 @@ private:
     QProgressBar* progress_bar_;
     int last_progress_percent_;
     bool stop_requested_;
+    std::chrono::steady_clock::time_point sync_started_at_;
+    bool sync_timing_active_;
 
     RsyncRunner runner_;
 };

@@ -59,12 +59,16 @@
         <translation>Detenido</translation>
     </message>
     <message>
+        <source>The program has stopped. Press the button to resume.</source>
+        <translation>El programa se ha detenido. Pulse el botón para reanudar.</translation>
+    </message>
+    <message>
         <source>Done</source>
         <translation>Completado</translation>
     </message>
     <message>
         <source>Mirroring complete.</source>
-        <translation>Espejado completado.</translation>
+        <translation>Espejado terminado.</translation>
     </message>
     <message>
         <source>Failed</source>

@@ -17,6 +17,7 @@
 #include <QWidget>
 
 #include "utils/AppSetup.hpp"
+#include "utils/DurationFormat.hpp"
 #include "utils/Settings.hpp"
 
 namespace {
@@ -107,7 +108,7 @@ QProgressBar#progress-bar {
 }
 
 QProgressBar#progress-bar::chunk {
-  background: #1f7acc;
+  background: #b51616;
   border-radius: 6px;
 }
 
@@ -146,7 +147,9 @@ MainWindow::MainWindow(const std::string& icon_name)
       status_update_scheduled_(false),
       progress_bar_(nullptr),
       last_progress_percent_(-1),
-      stop_requested_(false) {
+      stop_requested_(false),
+      sync_started_at_(),
+      sync_timing_active_(false) {
     setObjectName("main-window");
     setWindowTitle(tr("Simple Mirror"));
     setMinimumSize(700, 350);
@@ -265,20 +268,36 @@ MainWindow::MainWindow(const std::string& icon_name)
     runner_.set_progress_callback([this](int percent, const std::string& progress_line) {
         if (percent > last_progress_percent_) {
             last_progress_percent_ = percent;
-            progress_bar_->setValue(last_progress_percent_);
         }
-        progress_bar_->setFormat(QString::fromStdString(progress_line));
+        progress_bar_->setValue(last_progress_percent_);
+
+        QString format = QString::fromStdString(progress_line);
+        const int percent_sign = format.indexOf('%');
+        if (percent_sign > 0) {
+            bool ok = false;
+            format.left(percent_sign).toInt(&ok);
+            if (ok) {
+                format = QString::number(last_progress_percent_) + "%" + format.mid(percent_sign + 1);
+            }
+        }
+        progress_bar_->setFormat(format);
     });
     runner_.set_finished_callback([this](int exit_code, bool signaled) {
         if (stop_requested_ || signaled) {
             progress_bar_->setFormat(tr("Stopped"));
-            set_status_text(tr("Stopped"));
+            set_status_text(tr("The program has stopped. Press the button to resume."));
         } else if (exit_code == 0) {
+            QString elapsed_text = duration_format::to_hh_mm_ss(std::chrono::milliseconds::zero());
+            if (sync_timing_active_) {
+                const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::steady_clock::now() - sync_started_at_);
+                elapsed_text = duration_format::to_hh_mm_ss(elapsed);
+            }
             settings::save(settings::Settings{
                 origin_chooser_->path().toStdString(),
                 destination_chooser_->path().toStdString()});
             progress_bar_->setValue(100);
-            progress_bar_->setFormat(tr("Done"));
+            progress_bar_->setFormat(tr("Done") + " (" + elapsed_text + ")");
             set_status_text(tr("Mirroring complete."));
         } else {
             progress_bar_->setFormat(tr("Failed"));
@@ -345,11 +364,16 @@ void MainWindow::set_running_state(bool running) {
     destination_chooser_->setChooserEnabled(!running);
 
     if (running) {
+        sync_started_at_ = std::chrono::steady_clock::now();
+        sync_timing_active_ = true;
         last_progress_percent_ = -1;
         progress_bar_->setValue(0);
         progress_bar_->setFormat(tr("Running..."));
         set_status_text(tr("Comparing the two folders..."));
+        return;
     }
+
+    sync_timing_active_ = false;
 }
 
 void MainWindow::on_sync_clicked() {

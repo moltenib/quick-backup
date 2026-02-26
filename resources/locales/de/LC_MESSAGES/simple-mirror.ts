@@ -59,6 +59,10 @@
         <translation>Gestoppt</translation>
     </message>
     <message>
+        <source>The program has stopped. Press the button to resume.</source>
+        <translation>Das Programm wurde gestoppt. Drücken Sie die Schaltfläche, um fortzufahren.</translation>
+    </message>
+    <message>
         <source>Done</source>
         <translation>Fertig</translation>
     </message>

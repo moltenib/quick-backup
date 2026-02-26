@@ -56,16 +56,12 @@ private:
     ProgressCallback progress_callback_;
     FinishedCallback finished_callback_;
 
-    const std::regex percent_regex_{R"((\d{1,3})%)"};
-    const std::regex speed_regex_{R"(([0-9][0-9.,]*\s*[kMGTPE]?i?B/s))"};
-    const std::regex overall_with_checks_regex_{
-        R"(\(xfr#\d+,\s*(ir-chk|to-chk)=\d+/\d+\))"};
+    const std::regex overall_progress_regex_{
+        R"(^[0-9][0-9.,]*[kKMGTPE]?i?[bB]?\s+([0-9]{1,3})%\s+([0-9][0-9.,]*\s*[kKMGTPE]?i?B/s)\s+[0-9]+:[0-9]{2}:[0-9]{2}(\s+\(xfr#[0-9]+,\s*(ir-chk|to-chk)=[0-9]+/[0-9]+\))?\s*$)"};
     const std::regex filelist_progress_noise_regex_{
         R"(\(xfr#0,\s*(ir-chk|to-chk)=)"};
     const std::regex summary_line_regex_{
         R"(^(sending incremental file list|receiving incremental file list|sent [0-9].*|total size is .*|speedup is .*))"};
     const std::regex error_line_regex_{
         R"(^(rsync:|rsync error:))"};
-    const std::regex progress_with_checks_prefix_regex_{
-        R"(^[0-9][0-9.,]*\s+[0-9]{1,3}%.*\((xfr#|ir-chk=|to-chk=).*)"};
 };

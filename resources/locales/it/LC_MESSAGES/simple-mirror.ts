@@ -59,12 +59,16 @@
         <translation>Fermato</translation>
     </message>
     <message>
+        <source>The program has stopped. Press the button to resume.</source>
+        <translation>Il programma si è fermato. Premi il pulsante per riprendere.</translation>
+    </message>
+    <message>
         <source>Done</source>
         <translation>Completato</translation>
     </message>
     <message>
         <source>Mirroring complete.</source>
-        <translation>Specchiatura completata.</translation>
+        <translation>Specchiatura terminata.</translation>
     </message>
     <message>
         <source>Failed</source>

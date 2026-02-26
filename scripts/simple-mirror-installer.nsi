@@ -138,6 +138,10 @@ Section "Uninstall"
     Delete "$SMPROGRAMS\Simple Mirror\Uninstall Simple Mirror.lnk"
     RMDir "$SMPROGRAMS\Simple Mirror"
 
+    SetShellVarContext current
+    RMDir /r "$LOCALAPPDATA\simple-mirror"
+    RMDir /r "$APPDATA\simple-mirror"
+
     RMDir /r "$INSTDIR"
     DeleteRegKey HKLM "${UNINSTALL_KEY}"
     DeleteRegKey HKLM "Software\Simple Mirror"

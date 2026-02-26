@@ -59,12 +59,16 @@
         <translation>Arrêté</translation>
     </message>
     <message>
+        <source>The program has stopped. Press the button to resume.</source>
+        <translation>Le programme s&apos;est arrêté. Appuyez sur le bouton pour reprendre.</translation>
+    </message>
+    <message>
         <source>Done</source>
         <translation>Terminé</translation>
     </message>
     <message>
         <source>Mirroring complete.</source>
-        <translation>Mise en miroir terminée.</translation>
+        <translation>Mise en miroir achevée.</translation>
     </message>
     <message>
         <source>Failed</source>

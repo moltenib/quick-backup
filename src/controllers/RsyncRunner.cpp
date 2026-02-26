@@ -382,35 +382,19 @@ bool RsyncRunner::parse_overall_progress_line(
     const std::string& line,
     int& percent,
     std::string& display_line) const {
-    // Parse `progress2` lines with ir-chk/to-chk as progress-only UI updates
-    if (!std::regex_search(line, overall_with_checks_regex_)) {
+    const std::string trimmed = ltrim_copy(line);
+    if (trimmed.empty()) {
         return false;
     }
 
     std::smatch match;
-    if (!std::regex_search(line, match, percent_regex_) || match.size() < 2) {
+    if (!std::regex_match(trimmed, match, overall_progress_regex_) || match.size() < 3) {
         return false;
     }
 
     percent = std::stoi(match[1].str());
 
-    std::string speed;
-    std::smatch speed_match;
-    if (std::regex_search(line, speed_match, speed_regex_) && speed_match.size() >= 2) {
-        speed = speed_match[1].str();
-        speed = ltrim_copy(speed);
-
-        const auto alpha_it = std::find_if(speed.begin(), speed.end(), [](unsigned char ch) {
-            return std::isalpha(ch) != 0;
-        });
-        if (alpha_it != speed.end() && alpha_it != speed.begin()) {
-            const std::size_t alpha_index =
-                static_cast<std::size_t>(std::distance(speed.begin(), alpha_it));
-            if (speed[alpha_index - 1] != ' ') {
-                speed.insert(alpha_index, " ");
-            }
-        }
-    }
+    std::string speed = ltrim_copy(match[2].str());
 
     display_line = std::to_string(percent) + "%";
     if (!speed.empty()) {
@@ -431,15 +415,17 @@ bool RsyncRunner::parse_current_file_line(
         return false;
     }
 
+    int ignored_percent = 0;
+    std::string ignored_progress_display;
+    if (parse_overall_progress_line(trimmed, ignored_percent, ignored_progress_display)) {
+        return false;
+    }
+
     if (std::regex_search(trimmed, summary_line_regex_)) {
         return false;
     }
 
     if (std::regex_search(trimmed, error_line_regex_)) {
-        return false;
-    }
-
-    if (std::regex_search(trimmed, progress_with_checks_prefix_regex_)) {
         return false;
     }
 

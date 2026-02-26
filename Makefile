@@ -121,7 +121,6 @@ endif
 
 windows-all:
 ifeq ($(IS_WINDOWS),1)
-	$(MAKE) clean-all
 	$(MAKE) BUNDLE_RSYNC=1 installer-windows
 else
 	@echo "windows-all is $(WINDOWS_ENV_MSG)"

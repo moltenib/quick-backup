@@ -1,0 +1,25 @@
+[Desktop Entry]
+Type=Application
+Name=Simple Mirror
+Name[de]=Einfacher Spiegel
+Name[es]=Espejo simple
+Name[fr]=Miroir simple
+Name[it]=Specchio semplice
+Name[nl]=Eenvoudige spiegel
+Name[pt]=Espelho simples
+Name[ja]=シンプルミラー
+Name[zh_CN]=简易镜像
+Comment=Mirror directories with rsync
+Comment[de]=Ordner mit rsync spiegeln
+Comment[es]=Reflejar carpetas con rsync
+Comment[fr]=Dupliquer des dossiers avec rsync
+Comment[it]=Specchia cartelle con rsync
+Comment[nl]=Mappen spiegelen met rsync
+Comment[pt]=Espelhar pastas com rsync
+Comment[ja]=rsyncでディレクトリをミラーリング
+Comment[zh_CN]=使用 rsync 镜像目录
+Exec=simple-mirror
+Icon=simple-mirror
+Categories=Utility;FileTools;
+Terminal=false
+StartupNotify=true

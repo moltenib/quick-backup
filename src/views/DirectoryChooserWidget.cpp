@@ -48,10 +48,13 @@ QString DirectoryChooserWidget::path() const {
 void DirectoryChooserWidget::setChooserEnabled(bool enabled) {
     path_edit_->setEnabled(enabled);
     browse_button_->setEnabled(enabled);
-    browse_button_->setProperty("syncRunning", !enabled);
-    browse_button_->style()->unpolish(browse_button_);
-    browse_button_->style()->polish(browse_button_);
-    browse_button_->update();
+    const bool sync_running = !enabled;
+    if (browse_button_->property("syncRunning").toBool() != sync_running) {
+        browse_button_->setProperty("syncRunning", sync_running);
+        browse_button_->style()->unpolish(browse_button_);
+        browse_button_->style()->polish(browse_button_);
+        browse_button_->update();
+    }
     sync_entry_height();
 }
 
@@ -64,10 +67,12 @@ void DirectoryChooserWidget::open_dialog() {
 
 void DirectoryChooserWidget::update_entry_style() {
     const bool is_empty = path_edit_->text().isEmpty();
-    path_edit_->setProperty("placeholderStyled", is_empty);
-    path_edit_->style()->unpolish(path_edit_);
-    path_edit_->style()->polish(path_edit_);
-    path_edit_->update();
+    if (path_edit_->property("placeholderStyled").toBool() != is_empty) {
+        path_edit_->setProperty("placeholderStyled", is_empty);
+        path_edit_->style()->unpolish(path_edit_);
+        path_edit_->style()->polish(path_edit_);
+        path_edit_->update();
+    }
     sync_entry_height();
 }
 

@@ -9,9 +9,7 @@
 #include <QSizePolicy>
 #include <QScreen>
 #include <QFontMetrics>
-#include <QTextEdit>
-#include <QTextCursor>
-#include <QTextDocument>
+#include <QStatusBar>
 #include <QVBoxLayout>
 #include <QWidget>
 
@@ -86,15 +84,6 @@ QPushButton#sync-button:enabled:hover {
   border: 1px solid #d33b3b;
 }
 
-QTextEdit#output-view {
-  background: #000000;
-  color: #ffffff;
-  border: 1px solid #ffffff;
-  border-radius: 8px;
-  margin: 0;
-  padding: 0;
-}
-
 QProgressBar#progress-bar {
   color: #ffe7e7;
   border: 1px solid #4a1414;
@@ -109,6 +98,16 @@ QProgressBar#progress-bar::chunk {
   background: #cc1f1f;
   border-radius: 6px;
 }
+
+QStatusBar {
+  color: #ffe7e7;
+  background: #120606;
+  border-top: 1px solid #4a1414;
+}
+
+QStatusBar::item {
+  border: none;
+}
 )QSS";
 
 }  // namespace
@@ -117,14 +116,12 @@ MainWindow::MainWindow(const std::string& icon_name)
     : origin_chooser_(nullptr),
       destination_chooser_(nullptr),
       sync_button_(nullptr),
-      output_view_(nullptr),
       progress_bar_(nullptr),
       last_progress_percent_(-1),
       stop_requested_(false) {
     setObjectName("main-window");
     setWindowTitle(tr("Simple Mirror"));
-    setMinimumSize(800, 600);
-    resize(800, 600);
+    setMinimumSize(800, 300);
 
     app_setup::apply_window_icon(*this, icon_name);
 
@@ -188,12 +185,6 @@ MainWindow::MainWindow(const std::string& icon_name)
     top_row->addLayout(directory_column, 1);
     top_row->addLayout(sync_column);
 
-    output_view_ = new QTextEdit(central);
-    output_view_->setObjectName("output-view");
-    output_view_->setReadOnly(true);
-    output_view_->setUndoRedoEnabled(false);
-    output_view_->document()->setMaximumBlockCount(5000);
-
     progress_bar_ = new QProgressBar(central);
     progress_bar_->setObjectName("progress-bar");
     progress_bar_->setRange(0, 100);
@@ -201,15 +192,17 @@ MainWindow::MainWindow(const std::string& icon_name)
     progress_bar_->setFormat(tr("Idle"));
 
     main_layout->addLayout(top_row);
-    main_layout->addWidget(output_view_, 1);
+    main_layout->addStretch(1);
     main_layout->addWidget(progress_bar_);
 
     setCentralWidget(central);
+    statusBar()->setSizeGripEnabled(false);
+    statusBar()->showMessage(tr("Choose two directories to synchronize."));
     apply_stylesheet();
 
     QObject::connect(sync_button_, &QPushButton::clicked, [this]() { on_sync_clicked(); });
 
-    runner_.set_output_callback([this](const std::string& text) { append_output(text); });
+    runner_.set_file_callback([this](const std::string& text) { show_current_file(text); });
     runner_.set_progress_callback([this](int percent, const std::string& progress_line) {
         if (percent > last_progress_percent_) {
             last_progress_percent_ = percent;
@@ -218,15 +211,16 @@ MainWindow::MainWindow(const std::string& icon_name)
         progress_bar_->setFormat(QString::fromStdString(progress_line));
     });
     runner_.set_finished_callback([this](int exit_code, bool signaled) {
-        if (stop_requested_) {
+        if (stop_requested_ || signaled) {
             progress_bar_->setFormat(tr("Stopped"));
-        } else if (signaled) {
-            progress_bar_->setFormat(tr("Stopped"));
+            statusBar()->showMessage(tr("Stopped"));
         } else if (exit_code == 0) {
             progress_bar_->setValue(100);
             progress_bar_->setFormat(tr("Done"));
+            statusBar()->showMessage(tr("Done"));
         } else {
             progress_bar_->setFormat(tr("Failed"));
+            statusBar()->showMessage(tr("Failed"));
             show_error(
                 tr("Synchronization failed with exit code %1.").arg(exit_code),
                 tr("Synchronization failed"));
@@ -237,7 +231,7 @@ MainWindow::MainWindow(const std::string& icon_name)
 }
 
 MainWindow::~MainWindow() {
-    runner_.set_output_callback(nullptr);
+    runner_.set_file_callback(nullptr);
     runner_.set_progress_callback(nullptr);
     runner_.set_finished_callback(nullptr);
     if (runner_.is_running()) {
@@ -249,10 +243,11 @@ void MainWindow::apply_stylesheet() {
     setStyleSheet(kAppStyle);
 }
 
-void MainWindow::append_output(const std::string& text) {
-    output_view_->moveCursor(QTextCursor::End);
-    output_view_->insertPlainText(QString::fromUtf8(text.c_str()));
-    output_view_->moveCursor(QTextCursor::End);
+void MainWindow::show_current_file(const std::string& text) {
+    if (text.empty()) {
+        return;
+    }
+    statusBar()->showMessage(QString::fromStdString(text));
 }
 
 void MainWindow::set_running_state(bool running) {
@@ -264,6 +259,7 @@ void MainWindow::set_running_state(bool running) {
         last_progress_percent_ = -1;
         progress_bar_->setValue(0);
         progress_bar_->setFormat(tr("Running..."));
+        statusBar()->showMessage(tr("Running..."));
     }
 }
 
@@ -272,6 +268,7 @@ void MainWindow::on_sync_clicked() {
         stop_requested_ = true;
         runner_.stop();
         progress_bar_->setFormat(tr("Stopping..."));
+        statusBar()->showMessage(tr("Stopping..."));
         return;
     }
 
@@ -291,18 +288,14 @@ void MainWindow::on_sync_clicked() {
         return;
     }
 
-    output_view_->clear();
     stop_requested_ = false;
     set_running_state(true);
-    append_output(
-        "$ rsync -av --info=progress2 --delete \"" + origin + "\" \"" +
-        destination + "\"\n\n");
 
     std::string start_error;
     if (!runner_.start(origin, destination, start_error)) {
         set_running_state(false);
         progress_bar_->setFormat(tr("Error"));
-        append_output(tr("Error: %1\n").arg(QString::fromStdString(start_error)).toStdString());
+        statusBar()->showMessage(tr("Error"));
         show_error(QString::fromStdString(start_error), tr("Synchronization error"));
     }
 }
@@ -313,11 +306,9 @@ bool MainWindow::confirm_synchronize() {
     dialog.setIcon(QMessageBox::Warning);
     dialog.setText(tr("Any files in the destination folder that do not exist in the origin will be deleted."));
     dialog.setInformativeText(tr("This is to keep the destination folder up to date. Continue?"));
-    QPushButton* ok_button = dialog.addButton(QMessageBox::Ok);
-    QPushButton* stop_button = dialog.addButton(tr("Stop"), QMessageBox::RejectRole);
-    dialog.setDefaultButton(stop_button);
-    dialog.exec();
-    return dialog.clickedButton() == ok_button;
+    dialog.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    dialog.setDefaultButton(QMessageBox::Cancel);
+    return dialog.exec() == QMessageBox::Ok;
 }
 
 bool MainWindow::validate_inputs(std::string& origin, std::string& destination) {

@@ -8,7 +8,7 @@
 
 class RsyncRunner {
 public:
-    using OutputCallback = std::function<void(const std::string&)>;
+    using FileCallback = std::function<void(const std::string&)>;
     using ProgressCallback = std::function<void(int, const std::string&)>;
     using FinishedCallback = std::function<void(int, bool)>;
 
@@ -19,7 +19,7 @@ public:
     RsyncRunner(RsyncRunner&&) = delete;
     RsyncRunner& operator=(RsyncRunner&&) = delete;
 
-    void set_output_callback(OutputCallback callback);
+    void set_file_callback(FileCallback callback);
     void set_progress_callback(ProgressCallback callback);
     void set_finished_callback(FinishedCallback callback);
 
@@ -42,6 +42,9 @@ private:
         const std::string& line,
         int& percent,
         std::string& display_line) const;
+    bool parse_current_file_line(
+        const std::string& line,
+        std::string& file_name) const;
     bool is_filelist_progress_noise(const std::string& line) const;
 
     QProcess process_;
@@ -49,7 +52,7 @@ private:
     std::string rsync_executable_;
     std::string pending_output_;
 
-    OutputCallback output_callback_;
+    FileCallback file_callback_;
     ProgressCallback progress_callback_;
     FinishedCallback finished_callback_;
 
@@ -59,4 +62,10 @@ private:
         R"(\(xfr#\d+,\s*(ir-chk|to-chk)=\d+/\d+\))"};
     const std::regex filelist_progress_noise_regex_{
         R"(\(xfr#0,\s*(ir-chk|to-chk)=)"};
+    const std::regex summary_line_regex_{
+        R"(^(sending incremental file list|receiving incremental file list|sent [0-9].*|total size is .*|speedup is .*))"};
+    const std::regex error_line_regex_{
+        R"(^(rsync:|rsync error:))"};
+    const std::regex progress_with_checks_prefix_regex_{
+        R"(^[0-9][0-9.,]*\s+[0-9]{1,3}%.*\((xfr#|ir-chk=|to-chk=).*)"};
 };

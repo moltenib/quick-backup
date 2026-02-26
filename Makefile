@@ -1,20 +1,30 @@
 CXX := g++
-CXXFLAGS := -std=c++17 -Wall -Wextra -pedantic -fPIC -Isrc
-LDFLAGS :=
 WINDRES ?= windres
 PKG_CONFIG := pkg-config
+LRELEASE := lrelease
+WINDEPLOYQT ?= windeployqt6
+NSIS ?= makensis
+APP_VERSION ?= 1.0.0
+BUNDLE_RSYNC ?= 0
+
+CXXFLAGS := -std=c++17 -Wall -Wextra -pedantic -fPIC -Isrc
+LDFLAGS :=
 QT_CFLAGS := $(shell $(PKG_CONFIG) --cflags Qt6Widgets)
 QT_LIBS := $(shell $(PKG_CONFIG) --libs Qt6Widgets)
+
 .DEFAULT_GOAL := all
+
 ROOT_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
-EXE_SUFFIX :=
+UNAME_S := $(shell uname -s 2>/dev/null || echo)
+IS_WINDOWS := $(if $(filter Windows_NT,$(OS))$(filter MSYS% MINGW% CYGWIN%,$(UNAME_S)),1,0)
+WINDOWS_ENV_MSG := only available in a Windows/MSYS2 environment
 
 SRC := src/main.cpp src/views/MainWindow.cpp src/controllers/RsyncRunner.cpp src/views/DirectoryChooserWidget.cpp src/utils/AppSetup.cpp
 OBJ := $(SRC:.cpp=.o)
-BIN := $(ROOT_DIR)/simple-mirror$(EXE_SUFFIX)
+
 LOCALE_TS_FILES := $(wildcard resources/locales/*/LC_MESSAGES/simple-mirror.ts)
 QM_FILES := $(patsubst %/simple-mirror.ts,%/simple-mirror.qm,$(LOCALE_TS_FILES))
-LRELEASE := lrelease
+
 MSYS2_BUNDLE_SCRIPT := scripts/bundle-msys2-rsync.sh
 WIN_DLL_COLLECT_SCRIPT := scripts/collect-win-dlls.sh
 MSYS2_RSYNC_EXE := runtime/msys2/usr/bin/rsync.exe
@@ -23,41 +33,23 @@ WIN_DEPLOY_DIR := $(ROOT_DIR)/dist
 WIN_ICON_ICO := resources/icons/icon.ico
 WIN_ICON_RC := resources/icons/app-icon.rc
 WIN_ICON_OBJ := resources/icons/app-icon.o
-WINDEPLOYQT ?= windeployqt6
 WIN_MINGW_BIN := $(dir $(shell command -v $(CXX) 2>/dev/null))
-NSIS ?= makensis
 NSIS_SCRIPT := scripts/simple-mirror-installer.nsi
-APP_VERSION ?= 1.0.0
-UNAME_S := $(shell uname -s 2>/dev/null || echo)
-IS_WINDOWS := 0
-ifneq (,$(findstring Windows_NT,$(OS)))
-IS_WINDOWS := 1
-endif
-ifneq (,$(filter MSYS% MINGW% CYGWIN%,$(UNAME_S)))
-IS_WINDOWS := 1
-endif
 
-BUNDLE_RSYNC ?= 0
 ifeq ($(IS_WINDOWS),1)
-EXE_SUFFIX := .exe
-BIN := $(WIN_DEPLOY_DIR)/simple-mirror$(EXE_SUFFIX)
+BIN := $(WIN_DEPLOY_DIR)/simple-mirror.exe
 LDFLAGS += -mwindows
 ifneq ($(wildcard $(WIN_ICON_ICO)),)
 OBJ += $(WIN_ICON_OBJ)
 endif
 else
+BIN := $(ROOT_DIR)/simple-mirror
 LDFLAGS += -Wl,-rpath,'$$ORIGIN'
 endif
-BIN_DIR := $(dir $(BIN))
 
-ALL_TARGETS := $(BIN)
-ifeq ($(BUNDLE_RSYNC),1)
-ALL_TARGETS += $(MSYS2_RSYNC_EXE)
-endif
-DEPLOY_WINDOWS_DEPS := $(BIN) translations
-ifeq ($(BUNDLE_RSYNC),1)
-DEPLOY_WINDOWS_DEPS += $(MSYS2_RSYNC_EXE)
-endif
+BIN_DIR := $(dir $(BIN))
+ALL_TARGETS := $(BIN) $(if $(filter 1,$(BUNDLE_RSYNC)),$(MSYS2_RSYNC_EXE))
+DEPLOY_WINDOWS_DEPS := $(BIN) translations $(if $(filter 1,$(BUNDLE_RSYNC)),$(MSYS2_RSYNC_EXE))
 
 .PHONY: all run clean clean-all windows-all bundle-rsync clean-bundle bundle-runtime clean-runtime deploy-windows clean-windows-deploy translations installer-windows
 
@@ -94,8 +86,7 @@ ifeq ($(IS_WINDOWS),1)
 		rm -f "$(ROOT_DIR)/$$exe_name"; \
 	fi; \
 	mkdir -p "$(WIN_DEPLOY_DIR)/resources"; \
-	cp -a resources/locales "$(WIN_DEPLOY_DIR)/resources/"; \
-	cp -a resources/icons "$(WIN_DEPLOY_DIR)/resources/"; \
+	cp -a resources/locales resources/icons "$(WIN_DEPLOY_DIR)/resources/"; \
 	if [ -f "$(MSYS2_RSYNC_EXE)" ]; then \
 		mkdir -p "$(WIN_DEPLOY_DIR)/runtime/msys2/usr/bin"; \
 		cp -f "$(MSYS2_RSYNC_EXE)" "$(WIN_DEPLOY_DIR)/runtime/msys2/usr/bin/"; \
@@ -111,7 +102,7 @@ ifeq ($(IS_WINDOWS),1)
 	bash "$(WIN_DLL_COLLECT_SCRIPT)" "$(WIN_DEPLOY_DIR)" "$(WIN_MINGW_BIN)" "$$qt_bin_dir"; \
 	echo "Windows deployment is ready in $(WIN_DEPLOY_DIR)"
 else
-	@echo "deploy-windows is only available in a Windows/MSYS2 environment"
+	@echo "deploy-windows is $(WINDOWS_ENV_MSG)"
 	@exit 1
 endif
 
@@ -124,7 +115,7 @@ ifeq ($(IS_WINDOWS),1)
 	"$(NSIS)" -DAPP_VERSION="$(APP_VERSION)" "$(NSIS_SCRIPT)"
 	@echo "NSIS installer created: $(ROOT_DIR)/simple-mirror-setup-$(APP_VERSION).exe"
 else
-	@echo "installer-windows is only available in a Windows/MSYS2 environment"
+	@echo "installer-windows is $(WINDOWS_ENV_MSG)"
 	@exit 1
 endif
 
@@ -133,13 +124,13 @@ ifeq ($(IS_WINDOWS),1)
 	$(MAKE) clean-all
 	$(MAKE) BUNDLE_RSYNC=1 installer-windows
 else
-	@echo "windows-all is only available in a Windows/MSYS2 environment"
+	@echo "windows-all is $(WINDOWS_ENV_MSG)"
 	@exit 1
 endif
 
 bundle-runtime: $(BIN)
 ifeq ($(IS_WINDOWS),1)
-	@echo "bundle-runtime is Linux-only. Use deploy-windows on Windows."
+	@echo "bundle-runtime is Linux-only Use deploy-windows on Windows"
 	@exit 1
 else
 	@set -eu; \
@@ -188,6 +179,7 @@ clean:
 
 clean-all: clean clean-runtime clean-bundle clean-windows-deploy
 	rm -f "$(ROOT_DIR)"/simple-mirror-setup-*.exe
+	rm -rf "$(ROOT_DIR)/.cache"
 
 clean-bundle:
 	rm -rf runtime/msys2 .cache/msys2

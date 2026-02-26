@@ -8,7 +8,6 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QFileInfo>
-#include <QProcess>
 #include <QProcessEnvironment>
 #include <QStandardPaths>
 #include <QTimer>
@@ -29,7 +28,7 @@ RsyncRunner::RsyncRunner() : process_(), running_(false) {
 }
 
 RsyncRunner::~RsyncRunner() {
-    output_callback_ = nullptr;
+    file_callback_ = nullptr;
     progress_callback_ = nullptr;
     finished_callback_ = nullptr;
     QObject::disconnect(&process_, nullptr, nullptr, nullptr);
@@ -40,8 +39,8 @@ RsyncRunner::~RsyncRunner() {
     }
 }
 
-void RsyncRunner::set_output_callback(OutputCallback callback) {
-    output_callback_ = std::move(callback);
+void RsyncRunner::set_file_callback(FileCallback callback) {
+    file_callback_ = std::move(callback);
 }
 
 void RsyncRunner::set_progress_callback(ProgressCallback callback) {
@@ -184,11 +183,6 @@ bool RsyncRunner::resolve_rsync_executable(std::string& error) {
             return true;
         }
     }
-
-#ifdef _WIN32
-    // On Windows require a bundled or explicitly configured MSYS2 rsync to avoid
-    // mixed runtime environments from random PATH entries.
-#endif
 
 #ifdef _WIN32
     error = QCoreApplication::translate(
@@ -379,8 +373,9 @@ void RsyncRunner::emit_filtered_line(const std::string& line) {
         return;
     }
 
-    if (output_callback_) {
-        output_callback_(line + "\n");
+    std::string file_name;
+    if (parse_current_file_line(line, file_name) && file_callback_) {
+        file_callback_(file_name);
     }
 }
 
@@ -427,4 +422,37 @@ bool RsyncRunner::parse_overall_progress_line(
 
 bool RsyncRunner::is_filelist_progress_noise(const std::string& line) const {
     return std::regex_search(line, filelist_progress_noise_regex_);
+}
+
+bool RsyncRunner::parse_current_file_line(
+    const std::string& line,
+    std::string& file_name) const {
+    const std::string trimmed = ltrim_copy(line);
+    if (trimmed.empty()) {
+        return false;
+    }
+
+    if (std::regex_search(trimmed, summary_line_regex_)) {
+        return false;
+    }
+
+    if (std::regex_search(trimmed, error_line_regex_)) {
+        return false;
+    }
+
+    if (std::regex_search(trimmed, progress_with_checks_prefix_regex_)) {
+        return false;
+    }
+
+    if (trimmed == "./") {
+        return false;
+    }
+
+    if (trimmed.rfind("deleting ", 0) == 0) {
+        file_name = trimmed;
+        return true;
+    }
+
+    file_name = trimmed;
+    return true;
 }

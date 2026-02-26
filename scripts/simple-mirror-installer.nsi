@@ -25,12 +25,16 @@ InstallDir "$PROGRAMFILES64\Simple Mirror"
 InstallDirRegKey HKLM "Software\Simple Mirror" "Install_Dir"
 
 !define MUI_ABORTWARNING
+!insertmacro MUI_RESERVEFILE_LANGDLL
+!define MUI_FINISHPAGE_RUN
+!define MUI_FINISHPAGE_RUN_TEXT "$(RUN_APP_TEXT)"
+!define MUI_FINISHPAGE_RUN_NOTCHECKED
+!define MUI_FINISHPAGE_RUN_FUNCTION LaunchApp
 !if /FileExists "..\resources\icons\icon.ico"
 !define MUI_ICON "..\resources\icons\icon.ico"
 !define MUI_UNICON "..\resources\icons\icon.ico"
 !endif
 
-!insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "..\LICENSE"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
@@ -41,8 +45,47 @@ InstallDirRegKey HKLM "Software\Simple Mirror" "Install_Dir"
 !insertmacro MUI_UNPAGE_FINISH
 
 !insertmacro MUI_LANGUAGE "English"
+!insertmacro MUI_LANGUAGE "German"
+!insertmacro MUI_LANGUAGE "Spanish"
+!insertmacro MUI_LANGUAGE "Portuguese"
+!insertmacro MUI_LANGUAGE "Italian"
+!insertmacro MUI_LANGUAGE "Dutch"
+!insertmacro MUI_LANGUAGE "French"
+!insertmacro MUI_LANGUAGE "Japanese"
+!insertmacro MUI_LANGUAGE "SimpChinese"
+
+LangString APP_NAME_DISPLAY ${LANG_ENGLISH} "Simple Mirror"
+LangString APP_NAME_DISPLAY ${LANG_GERMAN} "Einfacher Spiegel"
+LangString APP_NAME_DISPLAY ${LANG_SPANISH} "Espejo simple"
+LangString APP_NAME_DISPLAY ${LANG_PORTUGUESE} "Espelho simples"
+LangString APP_NAME_DISPLAY ${LANG_ITALIAN} "Specchio semplice"
+LangString APP_NAME_DISPLAY ${LANG_DUTCH} "Eenvoudige spiegel"
+LangString APP_NAME_DISPLAY ${LANG_FRENCH} "Miroir simple"
+LangString APP_NAME_DISPLAY ${LANG_JAPANESE} "シンプルミラー"
+LangString APP_NAME_DISPLAY ${LANG_SIMPCHINESE} "简易镜像"
+
+LangString ^Name ${LANG_ENGLISH} "Simple Mirror"
+LangString ^Name ${LANG_GERMAN} "Einfacher Spiegel"
+LangString ^Name ${LANG_SPANISH} "Espejo simple"
+LangString ^Name ${LANG_PORTUGUESE} "Espelho simples"
+LangString ^Name ${LANG_ITALIAN} "Specchio semplice"
+LangString ^Name ${LANG_DUTCH} "Eenvoudige spiegel"
+LangString ^Name ${LANG_FRENCH} "Miroir simple"
+LangString ^Name ${LANG_JAPANESE} "シンプルミラー"
+LangString ^Name ${LANG_SIMPCHINESE} "简易镜像"
+
+LangString RUN_APP_TEXT ${LANG_ENGLISH} "Run Simple Mirror"
+LangString RUN_APP_TEXT ${LANG_GERMAN} "Einfacher Spiegel ausführen"
+LangString RUN_APP_TEXT ${LANG_SPANISH} "Ejecutar Espejo simple"
+LangString RUN_APP_TEXT ${LANG_PORTUGUESE} "Executar Espelho simples"
+LangString RUN_APP_TEXT ${LANG_ITALIAN} "Esegui Specchio semplice"
+LangString RUN_APP_TEXT ${LANG_DUTCH} "Eenvoudige spiegel starten"
+LangString RUN_APP_TEXT ${LANG_FRENCH} "Lancer Miroir simple"
+LangString RUN_APP_TEXT ${LANG_JAPANESE} "シンプルミラーを実行"
+LangString RUN_APP_TEXT ${LANG_SIMPCHINESE} "运行简易镜像"
 
 Function .onInit
+    !insertmacro MUI_LANGDLL_DISPLAY
     ${If} ${RunningX64}
         SetRegView 64
     ${EndIf}
@@ -54,6 +97,10 @@ Function un.onInit
     ${EndIf}
 FunctionEnd
 
+Function LaunchApp
+    ExecShell "" "$INSTDIR\${APP_EXE}"
+FunctionEnd
+
 Section "Install" SecInstall
     SetShellVarContext all
     SetOutPath "$INSTDIR"
@@ -62,7 +109,7 @@ Section "Install" SecInstall
     WriteUninstaller "$INSTDIR\Uninstall.exe"
 
     WriteRegStr HKLM "Software\Simple Mirror" "Install_Dir" "$INSTDIR"
-    WriteRegStr HKLM "${UNINSTALL_KEY}" "DisplayName" "${APP_NAME}"
+    WriteRegStr HKLM "${UNINSTALL_KEY}" "DisplayName" "$(APP_NAME_DISPLAY)"
     WriteRegStr HKLM "${UNINSTALL_KEY}" "DisplayVersion" "${APP_VERSION}"
     WriteRegStr HKLM "${UNINSTALL_KEY}" "Publisher" "${COMPANY_NAME}"
     WriteRegStr HKLM "${UNINSTALL_KEY}" "InstallLocation" "$INSTDIR"

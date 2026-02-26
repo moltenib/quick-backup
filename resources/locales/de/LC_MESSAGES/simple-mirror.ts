@@ -12,7 +12,7 @@
     <name>MainWindow</name>
     <message>
         <source>Simple Mirror</source>
-        <translation>Simple Mirror</translation>
+        <translation>Einfacher Spiegel</translation>
     </message>
     <message>
         <source>Origin:</source>
@@ -49,6 +49,10 @@
     <message>
         <source>Idle</source>
         <translation>Bereit</translation>
+    </message>
+    <message>
+        <source>Choose two directories to synchronize.</source>
+        <translation>Wählen Sie zwei Ordner zur Synchronisierung aus.</translation>
     </message>
     <message>
         <source>Stopped</source>

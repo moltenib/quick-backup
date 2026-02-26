@@ -51,6 +51,10 @@
         <translation>待機中</translation>
     </message>
     <message>
+        <source>Choose two directories to synchronize.</source>
+        <translation>同期する2つのフォルダーを選択してください。</translation>
+    </message>
+    <message>
         <source>Stopped</source>
         <translation>停止済み</translation>
     </message>

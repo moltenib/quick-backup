@@ -51,6 +51,10 @@
         <translation>空闲</translation>
     </message>
     <message>
+        <source>Choose two directories to synchronize.</source>
+        <translation>请选择两个要同步的文件夹。</translation>
+    </message>
+    <message>
         <source>Stopped</source>
         <translation>已停止</translation>
     </message>

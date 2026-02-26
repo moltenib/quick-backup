@@ -121,7 +121,7 @@ MainWindow::MainWindow(const std::string& icon_name)
       stop_requested_(false) {
     setObjectName("main-window");
     setWindowTitle(tr("Simple Mirror"));
-    setMinimumSize(800, 300);
+    setMinimumSize(700, 0);
 
     app_setup::apply_window_icon(*this, icon_name);
 
@@ -217,7 +217,7 @@ MainWindow::MainWindow(const std::string& icon_name)
         } else if (exit_code == 0) {
             progress_bar_->setValue(100);
             progress_bar_->setFormat(tr("Done"));
-            statusBar()->showMessage(tr("Done"));
+            statusBar()->showMessage(tr("Mirroring complete."));
         } else {
             progress_bar_->setFormat(tr("Failed"));
             statusBar()->showMessage(tr("Failed"));
@@ -259,7 +259,7 @@ void MainWindow::set_running_state(bool running) {
         last_progress_percent_ = -1;
         progress_bar_->setValue(0);
         progress_bar_->setFormat(tr("Running..."));
-        statusBar()->showMessage(tr("Running..."));
+        statusBar()->showMessage(tr("Comparing the two folders..."));
     }
 }
 

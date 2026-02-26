@@ -63,6 +63,10 @@
         <translation>Voltooid</translation>
     </message>
     <message>
+        <source>Mirroring complete.</source>
+        <translation>Spiegelen voltooid.</translation>
+    </message>
+    <message>
         <source>Failed</source>
         <translation>Mislukt</translation>
     </message>
@@ -77,6 +81,10 @@
     <message>
         <source>Running...</source>
         <translation>Bezig...</translation>
+    </message>
+    <message>
+        <source>Comparing the two folders...</source>
+        <translation>De twee mappen worden vergeleken...</translation>
     </message>
     <message>
         <source>Stopping...</source>

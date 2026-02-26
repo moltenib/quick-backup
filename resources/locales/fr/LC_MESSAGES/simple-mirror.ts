@@ -63,6 +63,10 @@
         <translation>Terminé</translation>
     </message>
     <message>
+        <source>Mirroring complete.</source>
+        <translation>Mise en miroir terminée.</translation>
+    </message>
+    <message>
         <source>Failed</source>
         <translation>Échec</translation>
     </message>
@@ -77,6 +81,10 @@
     <message>
         <source>Running...</source>
         <translation>En cours...</translation>
+    </message>
+    <message>
+        <source>Comparing the two folders...</source>
+        <translation>Comparaison des deux dossiers...</translation>
     </message>
     <message>
         <source>Stopping...</source>

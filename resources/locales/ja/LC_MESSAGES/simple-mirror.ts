@@ -63,6 +63,10 @@
         <translation>完了</translation>
     </message>
     <message>
+        <source>Mirroring complete.</source>
+        <translation>ミラーリングが完了しました。</translation>
+    </message>
+    <message>
         <source>Failed</source>
         <translation>失敗</translation>
     </message>
@@ -77,6 +81,10 @@
     <message>
         <source>Running...</source>
         <translation>実行中...</translation>
+    </message>
+    <message>
+        <source>Comparing the two folders...</source>
+        <translation>2つのフォルダーを比較しています...</translation>
     </message>
     <message>
         <source>Stopping...</source>

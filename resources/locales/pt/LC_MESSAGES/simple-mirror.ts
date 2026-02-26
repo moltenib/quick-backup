@@ -125,6 +125,14 @@
         <translation>Selecione as pastas de origem e destino.</translation>
     </message>
     <message>
+        <source>Cannot access origin folder: %1</source>
+        <translation>Não é possível aceder à pasta de origem: %1</translation>
+    </message>
+    <message>
+        <source>Cannot access destination folder: %1</source>
+        <translation>Não é possível aceder à pasta de destino: %1</translation>
+    </message>
+    <message>
         <source>Origin folder does not exist: %1</source>
         <translation>A pasta de origem não existe: %1</translation>
     </message>

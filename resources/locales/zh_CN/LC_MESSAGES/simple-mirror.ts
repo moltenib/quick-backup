@@ -125,6 +125,14 @@
         <translation>请选择源目录和目标目录。</translation>
     </message>
     <message>
+        <source>Cannot access origin folder: %1</source>
+        <translation>无法访问源目录：%1</translation>
+    </message>
+    <message>
+        <source>Cannot access destination folder: %1</source>
+        <translation>无法访问目标目录：%1</translation>
+    </message>
+    <message>
         <source>Origin folder does not exist: %1</source>
         <translation>源目录不存在：%1</translation>
     </message>

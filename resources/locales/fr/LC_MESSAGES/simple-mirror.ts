@@ -125,6 +125,14 @@
         <translation>Veuillez sélectionner les dossiers d&apos;origine et de destination.</translation>
     </message>
     <message>
+        <source>Cannot access origin folder: %1</source>
+        <translation>Impossible d&apos;accéder au dossier d&apos;origine : %1</translation>
+    </message>
+    <message>
+        <source>Cannot access destination folder: %1</source>
+        <translation>Impossible d&apos;accéder au dossier de destination : %1</translation>
+    </message>
+    <message>
         <source>Origin folder does not exist: %1</source>
         <translation>Le dossier d&apos;origine n&apos;existe pas : %1</translation>
     </message>

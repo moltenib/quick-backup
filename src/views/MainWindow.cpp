@@ -23,19 +23,19 @@ namespace {
 
 const char* kAppStyle = R"QSS(
 #main-window {
-  background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #0b0b0b, stop:1 #160707);
+  background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #0b0f13, stop:1 #071622);
 }
 
 QLabel#origin-label,
 QLabel#destination-label {
-  color: #ffd6d6;
+  color: #d6ecff;
 }
 
 QLineEdit#origin-edit,
 QLineEdit#destination-edit {
-  color: #ffe7e7;
-  background-color: #2a0d0d;
-  border: 1px solid #6f2020;
+  color: #e7f3ff;
+  background-color: #0d1f2a;
+  border: 1px solid #20506f;
   border-radius: 6px;
   padding: 4px;
 }
@@ -49,11 +49,18 @@ QLineEdit#destination-edit[placeholderStyled="true"] {
 QPushButton#browse-origin,
 QPushButton#browse-destination,
 QPushButton#sync-button {
-  color: #ffe7e7;
-  background-color: #2a0d0d;
-  border: 1px solid #6f2020;
+  color: #e7f3ff;
+  background-color: #0d1f2a;
+  border: 1px solid #20506f;
   border-radius: 6px;
   padding: 6px 10px;
+}
+
+QPushButton#browse-origin,
+QPushButton#browse-destination {
+  color: #e7f3ff;
+  background-color: #0d1f2a;
+  border: 1px solid #20506f;
 }
 
 QPushButton#browse-origin[syncRunning="true"],
@@ -65,8 +72,9 @@ QPushButton#browse-destination[syncRunning="true"] {
 
 QPushButton#browse-origin:enabled:hover,
 QPushButton#browse-destination:enabled:hover {
-  background-color: #1c0606;
-  border: 1px solid #531717;
+  color: #e7f3ff;
+  background-color: #06121c;
+  border: 1px solid #173d53;
 }
 
 QPushButton#browse-origin:disabled,
@@ -89,8 +97,8 @@ QPushButton#sync-button:enabled:hover {
 }
 
 QProgressBar#progress-bar {
-  color: #ffe7e7;
-  border: 1px solid #4a1414;
+  color: #e7f3ff;
+  border: 1px solid #14344a;
   border-radius: 6px;
   background: #1b1b1b;
   text-align: center;
@@ -99,13 +107,13 @@ QProgressBar#progress-bar {
 }
 
 QProgressBar#progress-bar::chunk {
-  background: #cc1f1f;
+  background: #1f7acc;
   border-radius: 6px;
 }
 
 QStatusBar#status-bar {
-  color: #ffe7e7;
-  background: #120606;
+  color: #e7f3ff;
+  background: transparent;
   border: none;
   padding: 0;
   margin: 0;
@@ -118,7 +126,8 @@ QStatusBar#status-bar::item {
 }
 
 QLabel#status-label {
-  color: #ffe7e7;
+  color: #e7f3ff;
+  background: transparent;
   font-size: 112%;
   padding: 0;
   margin: 0;

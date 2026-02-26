@@ -125,6 +125,14 @@
         <translation>コピー元フォルダーとコピー先フォルダーの両方を選択してください。</translation>
     </message>
     <message>
+        <source>Cannot access origin folder: %1</source>
+        <translation>コピー元フォルダーにアクセスできません: %1</translation>
+    </message>
+    <message>
+        <source>Cannot access destination folder: %1</source>
+        <translation>コピー先フォルダーにアクセスできません: %1</translation>
+    </message>
+    <message>
         <source>Origin folder does not exist: %1</source>
         <translation>コピー元フォルダーが存在しません: %1</translation>
     </message>

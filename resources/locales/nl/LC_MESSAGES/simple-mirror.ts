@@ -125,6 +125,14 @@
         <translation>Selecteer zowel de bron- als de doelmap.</translation>
     </message>
     <message>
+        <source>Cannot access origin folder: %1</source>
+        <translation>Kan geen toegang krijgen tot de bronmap: %1</translation>
+    </message>
+    <message>
+        <source>Cannot access destination folder: %1</source>
+        <translation>Kan geen toegang krijgen tot de doelmap: %1</translation>
+    </message>
+    <message>
         <source>Origin folder does not exist: %1</source>
         <translation>Bronmap bestaat niet: %1</translation>
     </message>

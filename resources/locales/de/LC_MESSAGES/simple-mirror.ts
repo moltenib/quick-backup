@@ -125,6 +125,14 @@
         <translation>Bitte wählen Sie sowohl Quell- als auch Zielordner.</translation>
     </message>
     <message>
+        <source>Cannot access origin folder: %1</source>
+        <translation>Auf den Quellordner kann nicht zugegriffen werden: %1</translation>
+    </message>
+    <message>
+        <source>Cannot access destination folder: %1</source>
+        <translation>Auf den Zielordner kann nicht zugegriffen werden: %1</translation>
+    </message>
+    <message>
         <source>Origin folder does not exist: %1</source>
         <translation>Quellordner existiert nicht: %1</translation>
     </message>

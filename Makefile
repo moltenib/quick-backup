@@ -112,7 +112,7 @@ ifeq ($(IS_WINDOWS),1)
 		echo "installer-windows requires NSIS (makensis)"; \
 		exit 1; \
 	fi
-	"$(NSIS)" -DAPP_VERSION="$(APP_VERSION)" "$(NSIS_SCRIPT)"
+	"$(NSIS)" /INPUTCHARSET UTF8 /OUTPUTCHARSET UTF8 -DAPP_VERSION="$(APP_VERSION)" "$(NSIS_SCRIPT)"
 	@echo "NSIS installer created: $(ROOT_DIR)/simple-mirror-setup-$(APP_VERSION).exe"
 else
 	@echo "installer-windows is $(WINDOWS_ENV_MSG)"

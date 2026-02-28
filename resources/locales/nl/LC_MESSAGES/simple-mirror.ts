@@ -103,12 +103,6 @@
         <translation>Fout</translation>
     </message>
     <message>
-        <source>Error: %1
-</source>
-        <translation>Fout: %1
-</translation>
-    </message>
-    <message>
         <source>Synchronization error</source>
         <translation>Synchronisatiefout</translation>
     </message>
@@ -117,32 +111,8 @@
         <translation>Melding</translation>
     </message>
     <message>
-        <source>I understand the risk</source>
-        <translation>Ik begrijp het risico</translation>
-    </message>
-    <message>
         <source>WARNING: POSSIBLE DATA LOSS!</source>
         <translation>WAARSCHUWING: MOGELIJK GEGEVENSVERLIES</translation>
-    </message>
-    <message>
-        <source>Any files in the destination folder that do not exist in the origin will be deleted.
-
-This is to keep the destination folder up to date. The origin folder is never altered.
-
-Continue?</source>
-        <translation>Bestanden in de doelmap die niet in de bronmap bestaan, worden verwijderd.
-
-Hiermee blijft de doelmap up-to-date. De bronmap wordt nooit gewijzigd.
-
-Wilt u doorgaan?</translation>
-    </message>
-    <message>
-        <source>Any files in the destination folder that do not exist in the origin will be deleted.</source>
-        <translation>Bestanden in de doelmap die niet in de bronmap bestaan, worden verwijderd.</translation>
-    </message>
-    <message>
-        <source>This is to keep the destination folder up to date. The origin folder is never altered. Continue?</source>
-        <translation>Hiermee blijft de doelmap up-to-date. De bronmap wordt nooit gewijzigd. Wilt u doorgaan?</translation>
     </message>
     <message>
         <source>Please choose both origin and destination folders.</source>
@@ -164,6 +134,18 @@ Wilt u doorgaan?</translation>
         <source>Destination folder does not exist: %1</source>
         <translation>Doelmap bestaat niet: %1</translation>
     </message>
+    <message>
+        <source>This is a one-way synchronization. The origin will remain unchanged, and any files in the destination folder that do not exist in the origin will be deleted.
+
+By continuing, you confirm that the selected paths are correct, and that you accept your responsibility for any data loss under applicable law.</source>
+        <translation>Dit is een eenrichtingssynchronisatie. De bron blijft ongewijzigd en alle bestanden in de doelmap die niet in de bron bestaan, worden verwijderd.
+
+Door door te gaan, bevestigt u dat de geselecteerde paden correct zijn en dat u uw verantwoordelijkheid aanvaardt voor eventueel gegevensverlies volgens het toepasselijke recht.</translation>
+    </message>
+    <message>
+        <source>I understand the risk, continue</source>
+        <translation>Ik begrijp het risico, doorgaan</translation>
+    </message>
 </context>
 <context>
     <name>RsyncRunner</name>
@@ -176,12 +158,20 @@ Wilt u doorgaan?</translation>
         <translation>SIMPLE_MIRROR_RSYNC is ingesteld maar verwijst niet naar een geldig bestand: %1</translation>
     </message>
     <message>
-        <source>Could not find rsync. Set SIMPLE_MIRROR_RSYNC, add rsync to PATH, or bundle &quot;runtime/bin/rsync&quot; on Linux, or &quot;runtime/msys2/usr/bin/rsync.exe&quot; on Windows.</source>
-        <translation>Kan rsync niet vinden. Stelt u SIMPLE_MIRROR_RSYNC in, voegt u rsync toe aan PATH, of bundelt u &quot;runtime/bin/rsync&quot; op Linux, of &quot;runtime/msys2/usr/bin/rsync.exe&quot; op Windows.</translation>
-    </message>
-    <message>
         <source>Deleting %1</source>
         <translation>Verwijderen van %1</translation>
+    </message>
+    <message>
+        <source>SIMPLE_MIRROR_RSYNC points to rsync but MSYS2 runtime is missing (msys-2.0.dll not found near rsync, app directory, or working directory): %1</source>
+        <translation>SIMPLE_MIRROR_RSYNC verwijst naar rsync, maar de MSYS2-runtime ontbreekt (msys-2.0.dll is niet gevonden naast rsync, in de appmap of in de werkmap): %1</translation>
+    </message>
+    <message>
+        <source>Could not find bundled MSYS2 rsync. Run &quot;make bundle-rsync&quot; or &quot;make windows-all&quot;, or set SIMPLE_MIRROR_RSYNC to an MSYS2 rsync.exe.</source>
+        <translation>Gebundelde MSYS2-rsync is niet gevonden. Voer &quot;make bundle-rsync&quot; of &quot;make windows-all&quot; uit, of stel SIMPLE_MIRROR_RSYNC in op een MSYS2-rsync.exe.</translation>
+    </message>
+    <message>
+        <source>Could not find rsync. Set SIMPLE_MIRROR_RSYNC, add rsync to PATH, or bundle &quot;runtime/bin/rsync&quot;.</source>
+        <translation>Kon rsync niet vinden. Stel SIMPLE_MIRROR_RSYNC in, voeg rsync toe aan PATH of bundel &quot;runtime/bin/rsync&quot;.</translation>
     </message>
 </context>
 </TS>

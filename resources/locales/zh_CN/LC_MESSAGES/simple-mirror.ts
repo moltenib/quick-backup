@@ -103,12 +103,6 @@
         <translation>错误</translation>
     </message>
     <message>
-        <source>Error: %1
-</source>
-        <translation>错误：%1
-</translation>
-    </message>
-    <message>
         <source>Synchronization error</source>
         <translation>同步错误</translation>
     </message>
@@ -117,32 +111,8 @@
         <translation>提示</translation>
     </message>
     <message>
-        <source>I understand the risk</source>
-        <translation>我理解风险</translation>
-    </message>
-    <message>
         <source>WARNING: POSSIBLE DATA LOSS!</source>
         <translation>警告：可能发生数据丢失</translation>
-    </message>
-    <message>
-        <source>Any files in the destination folder that do not exist in the origin will be deleted.
-
-This is to keep the destination folder up to date. The origin folder is never altered.
-
-Continue?</source>
-        <translation>目标文件夹中不存在于源目录的文件将被删除。
-
-这样可以让目标文件夹保持最新。源文件夹永远不会被修改。
-
-是否继续？</translation>
-    </message>
-    <message>
-        <source>Any files in the destination folder that do not exist in the origin will be deleted.</source>
-        <translation>目标文件夹中不存在于源目录的文件将被删除。</translation>
-    </message>
-    <message>
-        <source>This is to keep the destination folder up to date. The origin folder is never altered. Continue?</source>
-        <translation>这样可以让目标文件夹保持最新。源文件夹永远不会被修改。是否继续？</translation>
     </message>
     <message>
         <source>Please choose both origin and destination folders.</source>
@@ -164,6 +134,18 @@ Continue?</source>
         <source>Destination folder does not exist: %1</source>
         <translation>目标目录不存在：%1</translation>
     </message>
+    <message>
+        <source>This is a one-way synchronization. The origin will remain unchanged, and any files in the destination folder that do not exist in the origin will be deleted.
+
+By continuing, you confirm that the selected paths are correct, and that you accept your responsibility for any data loss under applicable law.</source>
+        <translation>这是单向同步。源目录将保持不变，目标目录中任何在源目录中不存在的文件都将被删除。
+
+继续即表示您确认所选路径正确，并且您接受在适用法律下对任何数据丢失承担责任。</translation>
+    </message>
+    <message>
+        <source>I understand the risk, continue</source>
+        <translation>我理解风险，继续</translation>
+    </message>
 </context>
 <context>
     <name>RsyncRunner</name>
@@ -176,12 +158,20 @@ Continue?</source>
         <translation>已设置 SIMPLE_MIRROR_RSYNC，但它没有指向有效文件：%1</translation>
     </message>
     <message>
-        <source>Could not find rsync. Set SIMPLE_MIRROR_RSYNC, add rsync to PATH, or bundle &quot;runtime/bin/rsync&quot; on Linux, or &quot;runtime/msys2/usr/bin/rsync.exe&quot; on Windows.</source>
-        <translation>找不到 rsync。请设置 SIMPLE_MIRROR_RSYNC、将 rsync 添加到 PATH，或在 Linux 上捆绑 &quot;runtime/bin/rsync&quot;，在 Windows 上捆绑 &quot;runtime/msys2/usr/bin/rsync.exe&quot;。</translation>
-    </message>
-    <message>
         <source>Deleting %1</source>
         <translation>正在删除 %1</translation>
+    </message>
+    <message>
+        <source>SIMPLE_MIRROR_RSYNC points to rsync but MSYS2 runtime is missing (msys-2.0.dll not found near rsync, app directory, or working directory): %1</source>
+        <translation>SIMPLE_MIRROR_RSYNC 指向 rsync，但缺少 MSYS2 运行时（在 rsync 附近、应用目录或工作目录中未找到 msys-2.0.dll）：%1</translation>
+    </message>
+    <message>
+        <source>Could not find bundled MSYS2 rsync. Run &quot;make bundle-rsync&quot; or &quot;make windows-all&quot;, or set SIMPLE_MIRROR_RSYNC to an MSYS2 rsync.exe.</source>
+        <translation>未找到随附的 MSYS2 rsync。请运行 &quot;make bundle-rsync&quot; 或 &quot;make windows-all&quot;，或将 SIMPLE_MIRROR_RSYNC 设置为 MSYS2 的 rsync.exe。</translation>
+    </message>
+    <message>
+        <source>Could not find rsync. Set SIMPLE_MIRROR_RSYNC, add rsync to PATH, or bundle &quot;runtime/bin/rsync&quot;.</source>
+        <translation>找不到 rsync。请设置 SIMPLE_MIRROR_RSYNC、将 rsync 添加到 PATH，或捆绑 &quot;runtime/bin/rsync&quot;。</translation>
     </message>
 </context>
 </TS>

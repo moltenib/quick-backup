@@ -459,15 +459,16 @@ void MainWindow::on_sync_clicked() {
 
 bool MainWindow::confirm_synchronize() {
     const QString body_text = tr(
-        "Any files in the destination folder that do not exist in the origin will be deleted.\n\n"
-        "This is to keep the destination folder up to date. The origin folder is never altered.\n\n"
-        "Continue?");
+        "This is a one-way synchronization. The origin will remain unchanged, and any files in the destination "
+        "folder that do not exist in the origin will be deleted.\n\n"
+        "By continuing, you confirm that the selected paths are correct, and that you accept your responsibility "
+        "for any data loss under applicable law.");
     return confirmation_dialog::show(
         this,
         tr("Notice"),
         tr("WARNING: POSSIBLE DATA LOSS!"),
         body_text,
-        tr("I understand the risk"));
+        tr("I understand the risk, continue"));
 }
 
 bool MainWindow::validate_inputs(std::string& origin, std::string& destination) {

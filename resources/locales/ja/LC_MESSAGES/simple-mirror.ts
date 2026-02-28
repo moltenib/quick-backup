@@ -103,12 +103,6 @@
         <translation>エラー</translation>
     </message>
     <message>
-        <source>Error: %1
-</source>
-        <translation>エラー: %1
-</translation>
-    </message>
-    <message>
         <source>Synchronization error</source>
         <translation>同期エラー</translation>
     </message>
@@ -117,32 +111,8 @@
         <translation>確認</translation>
     </message>
     <message>
-        <source>I understand the risk</source>
-        <translation>リスクを理解しました</translation>
-    </message>
-    <message>
         <source>WARNING: POSSIBLE DATA LOSS!</source>
         <translation>警告: データ損失の可能性があります</translation>
-    </message>
-    <message>
-        <source>Any files in the destination folder that do not exist in the origin will be deleted.
-
-This is to keep the destination folder up to date. The origin folder is never altered.
-
-Continue?</source>
-        <translation>コピー先フォルダーにあり、コピー元に存在しないファイルは削除されます。
-
-コピー先フォルダーを最新状態に保つためです。コピー元フォルダーは変更されません。
-
-続行しますか？</translation>
-    </message>
-    <message>
-        <source>Any files in the destination folder that do not exist in the origin will be deleted.</source>
-        <translation>コピー先フォルダーにあり、コピー元に存在しないファイルは削除されます。</translation>
-    </message>
-    <message>
-        <source>This is to keep the destination folder up to date. The origin folder is never altered. Continue?</source>
-        <translation>コピー先フォルダーを最新状態に保つためです。コピー元フォルダーは変更されません。続行しますか？</translation>
     </message>
     <message>
         <source>Please choose both origin and destination folders.</source>
@@ -164,6 +134,18 @@ Continue?</source>
         <source>Destination folder does not exist: %1</source>
         <translation>コピー先フォルダーが存在しません: %1</translation>
     </message>
+    <message>
+        <source>This is a one-way synchronization. The origin will remain unchanged, and any files in the destination folder that do not exist in the origin will be deleted.
+
+By continuing, you confirm that the selected paths are correct, and that you accept your responsibility for any data loss under applicable law.</source>
+        <translation>これは一方向の同期です。コピー元は変更されず、コピー先にあるファイルのうちコピー元に存在しないものは削除されます。
+
+続行すると、選択したパスが正しいこと、および適用法に基づくデータ損失に関する責任を受け入れることを確認したものとみなされます。</translation>
+    </message>
+    <message>
+        <source>I understand the risk, continue</source>
+        <translation>リスクを理解しました、続行</translation>
+    </message>
 </context>
 <context>
     <name>RsyncRunner</name>
@@ -176,12 +158,20 @@ Continue?</source>
         <translation>SIMPLE_MIRROR_RSYNC は設定されていますが、有効なファイルを指していません: %1</translation>
     </message>
     <message>
-        <source>Could not find rsync. Set SIMPLE_MIRROR_RSYNC, add rsync to PATH, or bundle &quot;runtime/bin/rsync&quot; on Linux, or &quot;runtime/msys2/usr/bin/rsync.exe&quot; on Windows.</source>
-        <translation>rsync が見つかりません。SIMPLE_MIRROR_RSYNC を設定するか、rsync を PATH に追加するか、Linux では &quot;runtime/bin/rsync&quot;、Windows では &quot;runtime/msys2/usr/bin/rsync.exe&quot; を同梱してください。</translation>
-    </message>
-    <message>
         <source>Deleting %1</source>
         <translation>%1 を削除中</translation>
+    </message>
+    <message>
+        <source>SIMPLE_MIRROR_RSYNC points to rsync but MSYS2 runtime is missing (msys-2.0.dll not found near rsync, app directory, or working directory): %1</source>
+        <translation>SIMPLE_MIRROR_RSYNC は rsync を指していますが、MSYS2 ランタイムが不足しています（msys-2.0.dll が rsync の近く、アプリケーションディレクトリ、または作業ディレクトリに見つかりません）: %1</translation>
+    </message>
+    <message>
+        <source>Could not find bundled MSYS2 rsync. Run &quot;make bundle-rsync&quot; or &quot;make windows-all&quot;, or set SIMPLE_MIRROR_RSYNC to an MSYS2 rsync.exe.</source>
+        <translation>バンドルされた MSYS2 rsync が見つかりません。&quot;make bundle-rsync&quot; または &quot;make windows-all&quot; を実行するか、SIMPLE_MIRROR_RSYNC に MSYS2 の rsync.exe を設定してください。</translation>
+    </message>
+    <message>
+        <source>Could not find rsync. Set SIMPLE_MIRROR_RSYNC, add rsync to PATH, or bundle &quot;runtime/bin/rsync&quot;.</source>
+        <translation>rsync が見つかりません。SIMPLE_MIRROR_RSYNC を設定するか、rsync を PATH に追加するか、&quot;runtime/bin/rsync&quot; を同梱してください。</translation>
     </message>
 </context>
 </TS>

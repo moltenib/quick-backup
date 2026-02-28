@@ -103,12 +103,6 @@
         <translation>Errore</translation>
     </message>
     <message>
-        <source>Error: %1
-</source>
-        <translation>Errore: %1
-</translation>
-    </message>
-    <message>
         <source>Synchronization error</source>
         <translation>Errore di sincronizzazione</translation>
     </message>
@@ -117,32 +111,8 @@
         <translation>Avviso</translation>
     </message>
     <message>
-        <source>I understand the risk</source>
-        <translation>Comprendo il rischio</translation>
-    </message>
-    <message>
         <source>WARNING: POSSIBLE DATA LOSS!</source>
         <translation>ATTENZIONE: POSSIBILE PERDITA DI DATI</translation>
-    </message>
-    <message>
-        <source>Any files in the destination folder that do not exist in the origin will be deleted.
-
-This is to keep the destination folder up to date. The origin folder is never altered.
-
-Continue?</source>
-        <translation>I file nella cartella di destinazione che non esistono nell&apos;origine verranno eliminati.
-
-Serve a mantenere aggiornata la cartella di destinazione. La cartella di origine non viene mai modificata.
-
-Continuare?</translation>
-    </message>
-    <message>
-        <source>Any files in the destination folder that do not exist in the origin will be deleted.</source>
-        <translation>I file nella cartella di destinazione che non esistono nell&apos;origine verranno eliminati.</translation>
-    </message>
-    <message>
-        <source>This is to keep the destination folder up to date. The origin folder is never altered. Continue?</source>
-        <translation>Serve a mantenere aggiornata la cartella di destinazione. La cartella di origine non viene mai modificata. Continuare?</translation>
     </message>
     <message>
         <source>Please choose both origin and destination folders.</source>
@@ -164,6 +134,18 @@ Continuare?</translation>
         <source>Destination folder does not exist: %1</source>
         <translation>La cartella di destinazione non esiste: %1</translation>
     </message>
+    <message>
+        <source>This is a one-way synchronization. The origin will remain unchanged, and any files in the destination folder that do not exist in the origin will be deleted.
+
+By continuing, you confirm that the selected paths are correct, and that you accept your responsibility for any data loss under applicable law.</source>
+        <translation>Questa è una sincronizzazione unidirezionale. L&apos;origine rimarrà invariata e tutti i file nella cartella di destinazione che non esistono nell&apos;origine verranno eliminati.
+
+Proseguendo, conferma che i percorsi selezionati sono corretti e che si assume la responsabilità per eventuali perdite di dati ai sensi della legge applicabile.</translation>
+    </message>
+    <message>
+        <source>I understand the risk, continue</source>
+        <translation>Comprendo il rischio, proseguire</translation>
+    </message>
 </context>
 <context>
     <name>RsyncRunner</name>
@@ -176,12 +158,20 @@ Continuare?</translation>
         <translation>SIMPLE_MIRROR_RSYNC è impostata ma non punta a un file valido: %1</translation>
     </message>
     <message>
-        <source>Could not find rsync. Set SIMPLE_MIRROR_RSYNC, add rsync to PATH, or bundle &quot;runtime/bin/rsync&quot; on Linux, or &quot;runtime/msys2/usr/bin/rsync.exe&quot; on Windows.</source>
-        <translation>Impossibile trovare rsync. Imposta SIMPLE_MIRROR_RSYNC, aggiungi rsync al PATH, oppure includi &quot;runtime/bin/rsync&quot; su Linux o &quot;runtime/msys2/usr/bin/rsync.exe&quot; su Windows.</translation>
-    </message>
-    <message>
         <source>Deleting %1</source>
         <translation>Eliminazione di %1</translation>
+    </message>
+    <message>
+        <source>SIMPLE_MIRROR_RSYNC points to rsync but MSYS2 runtime is missing (msys-2.0.dll not found near rsync, app directory, or working directory): %1</source>
+        <translation>SIMPLE_MIRROR_RSYNC punta a rsync, ma il runtime MSYS2 è mancante (msys-2.0.dll non trovata vicino a rsync, nella cartella dell&apos;applicazione o nella cartella di lavoro): %1</translation>
+    </message>
+    <message>
+        <source>Could not find bundled MSYS2 rsync. Run &quot;make bundle-rsync&quot; or &quot;make windows-all&quot;, or set SIMPLE_MIRROR_RSYNC to an MSYS2 rsync.exe.</source>
+        <translation>Impossibile trovare il rsync MSYS2 incluso. Eseguire &quot;make bundle-rsync&quot; o &quot;make windows-all&quot;, oppure impostare SIMPLE_MIRROR_RSYNC su un rsync.exe di MSYS2.</translation>
+    </message>
+    <message>
+        <source>Could not find rsync. Set SIMPLE_MIRROR_RSYNC, add rsync to PATH, or bundle &quot;runtime/bin/rsync&quot;.</source>
+        <translation>Impossibile trovare rsync. Impostare SIMPLE_MIRROR_RSYNC, aggiungere rsync al PATH oppure includere &quot;runtime/bin/rsync&quot;.</translation>
     </message>
 </context>
 </TS>

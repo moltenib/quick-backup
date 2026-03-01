@@ -66,6 +66,10 @@ Door door te gaan, bevestigt u dat de geselecteerde paden correct zijn en dat u 
         <translation>Synchroniseren</translation>
     </message>
     <message>
+        <source>Combine</source>
+        <translation>Combineren</translation>
+    </message>
+    <message>
         <source>Stop</source>
         <translation>Stoppen</translation>
     </message>

@@ -66,6 +66,10 @@ By continuing, you confirm that the selected paths are correct, and that you acc
         <translation>同步</translation>
     </message>
     <message>
+        <source>Combine</source>
+        <translation>合并</translation>
+    </message>
+    <message>
         <source>Stop</source>
         <translation>停止</translation>
     </message>

@@ -66,6 +66,10 @@ Al continuar, Ud. confirma que las rutas son correctas, y que asume su responsab
         <translation>Sincronizar</translation>
     </message>
     <message>
+        <source>Combine</source>
+        <translation>Combinar</translation>
+    </message>
+    <message>
         <source>Stop</source>
         <translation>Detener</translation>
     </message>

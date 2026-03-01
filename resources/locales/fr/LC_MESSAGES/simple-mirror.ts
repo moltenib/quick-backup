@@ -66,6 +66,10 @@ En continuant, vous confirmez que les chemins sélectionnés sont corrects et qu
         <translation>Synchroniser</translation>
     </message>
     <message>
+        <source>Combine</source>
+        <translation>Fusionner</translation>
+    </message>
+    <message>
         <source>Stop</source>
         <translation>Arrêter</translation>
     </message>

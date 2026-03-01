@@ -66,6 +66,10 @@ Indem Sie fortfahren, bestätigen Sie, dass die ausgewählten Pfade korrekt sind
         <translation>Synchronisieren</translation>
     </message>
     <message>
+        <source>Combine</source>
+        <translation>Zusammenführen</translation>
+    </message>
+    <message>
         <source>Stop</source>
         <translation>Stoppen</translation>
     </message>

@@ -165,9 +165,7 @@ void SyncButton::setRunningState(bool running, bool combine_mode) {
 void SyncButton::recomputeMinimumWidth() {
     const QFontMetrics metrics(font());
     const int minimum_width = std::max(
-                                  std::max(
-                                      metrics.horizontalAdvance(synchronize_text_),
-                                      metrics.horizontalAdvance(combine_text_)),
+                                  metrics.horizontalAdvance(synchronize_text_),
                                   metrics.horizontalAdvance(stop_text_)) +
                               32;
     setMinimumWidth(minimum_width);

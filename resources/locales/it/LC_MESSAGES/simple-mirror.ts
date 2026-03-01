@@ -66,6 +66,10 @@ Continuando, conferma che i percorsi selezionati sono corretti e che si assume l
         <translation>Sincronizza</translation>
     </message>
     <message>
+        <source>Combine</source>
+        <translation>Combinare</translation>
+    </message>
+    <message>
         <source>Stop</source>
         <translation>Ferma</translation>
     </message>

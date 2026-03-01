@@ -16,6 +16,8 @@ class QPropertyAnimation;
 class QStatusBar;
 class QString;
 class QCloseEvent;
+class QObject;
+class QEvent;
 
 class MainWindow : public QMainWindow {
 public:
@@ -26,16 +28,19 @@ public:
 
 protected:
     void closeEvent(QCloseEvent* event) override;
+    bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
     void apply_stylesheet();
     void set_status_text(const QString& text);
     void show_current_file(const std::string& text);
     void set_running_state(bool running);
+    void update_sync_button_text(bool running);
+    bool combine_mode_requested() const;
 
     void on_sync_clicked();
 
-    bool confirm_synchronize();
+    bool confirm_synchronize(bool delete_extraneous);
     bool validate_inputs(std::string& origin, std::string& destination);
     void show_error(const QString& message, const QString& title = QString());
 

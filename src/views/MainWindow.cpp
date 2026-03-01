@@ -12,7 +12,12 @@
 #include <QSizePolicy>
 #include <QScreen>
 #include <QFontMetrics>
+#include <QApplication>
+#include <QGuiApplication>
+#include <QKeyEvent>
+#include <QEvent>
 #include <QLayout>
+#include <QStyle>
 #include <QStatusBar>
 #include <QTimer>
 #include <QCloseEvent>
@@ -101,6 +106,17 @@ QPushButton#sync-button {
 QPushButton#sync-button:enabled:hover {
   background-color: #8f1010;
   border: 1px solid #d33b3b;
+}
+
+QPushButton#sync-button[combineMode="true"] {
+  background-color: #1f4f7a;
+  border: 1px solid #2f8adf;
+  color: #e7f3ff;
+}
+
+QPushButton#sync-button[combineMode="true"]:enabled:hover {
+  background-color: #173d61;
+  border: 1px solid #5ea7eb;
 }
 
 QProgressBar#progress-bar {
@@ -221,9 +237,12 @@ MainWindow::MainWindow(const std::string& icon_name)
     sync_button_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     const QFontMetrics metrics(sync_button_->font());
     const QString synchronize_text = tr("Synchronize");
+    const QString combine_text = tr("Combine");
     const QString stop_text = tr("Stop");
     const int min_button_width = std::max(
-                                     metrics.horizontalAdvance(synchronize_text),
+                                     std::max(
+                                         metrics.horizontalAdvance(synchronize_text),
+                                         metrics.horizontalAdvance(combine_text)),
                                      metrics.horizontalAdvance(stop_text)) +
                                  32;
     sync_button_->setMinimumWidth(min_button_width);
@@ -272,6 +291,7 @@ MainWindow::MainWindow(const std::string& icon_name)
     setCentralWidget(central);
     set_status_text(tr("Choose two directories to synchronize."));
     apply_stylesheet();
+    qApp->installEventFilter(this);
 
     QObject::connect(sync_button_, &QPushButton::clicked, [this]() { on_sync_clicked(); });
 
@@ -344,6 +364,7 @@ MainWindow::MainWindow(const std::string& icon_name)
 }
 
 MainWindow::~MainWindow() {
+    qApp->removeEventFilter(this);
     runner_.set_file_callback(nullptr);
     runner_.set_progress_callback(nullptr);
     runner_.set_finished_callback(nullptr);
@@ -367,6 +388,17 @@ void MainWindow::closeEvent(QCloseEvent* event) {
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
     runner_.stop_and_wait();
     event->accept();
+}
+
+bool MainWindow::eventFilter(QObject* watched, QEvent* event) {
+    if (!runner_.is_running() && event &&
+        (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease)) {
+        auto* key_event = static_cast<QKeyEvent*>(event);
+        if (key_event && key_event->key() == Qt::Key_Shift) {
+            update_sync_button_text(false);
+        }
+    }
+    return QMainWindow::eventFilter(watched, event);
 }
 
 void MainWindow::apply_stylesheet() {
@@ -408,7 +440,7 @@ void MainWindow::show_current_file(const std::string& text) {
 }
 
 void MainWindow::set_running_state(bool running) {
-    sync_button_->setText(running ? tr("Stop") : tr("Synchronize"));
+    update_sync_button_text(running);
     origin_chooser_->setChooserEnabled(!running);
     destination_chooser_->setChooserEnabled(!running);
 
@@ -426,6 +458,28 @@ void MainWindow::set_running_state(bool running) {
     }
 
     sync_timing_active_ = false;
+}
+
+void MainWindow::update_sync_button_text(bool running) {
+    if (!sync_button_) {
+        return;
+    }
+    const bool combine_mode = !running && combine_mode_requested();
+    if (sync_button_->property("combineMode").toBool() != combine_mode) {
+        sync_button_->setProperty("combineMode", combine_mode);
+        sync_button_->style()->unpolish(sync_button_);
+        sync_button_->style()->polish(sync_button_);
+        sync_button_->update();
+    }
+    if (running) {
+        sync_button_->setText(tr("Stop"));
+        return;
+    }
+    sync_button_->setText(combine_mode ? tr("Combine") : tr("Synchronize"));
+}
+
+bool MainWindow::combine_mode_requested() const {
+    return (QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier) != 0;
 }
 
 void MainWindow::on_sync_clicked() {
@@ -449,7 +503,8 @@ void MainWindow::on_sync_clicked() {
         return;
     }
 
-    if (!confirm_synchronize()) {
+    const bool delete_extraneous = !combine_mode_requested();
+    if (!confirm_synchronize(delete_extraneous)) {
         return;
     }
 
@@ -457,7 +512,7 @@ void MainWindow::on_sync_clicked() {
     set_running_state(true);
 
     std::string start_error;
-    if (!runner_.start(origin, destination, start_error)) {
+    if (!runner_.start(origin, destination, delete_extraneous, start_error)) {
         set_running_state(false);
         progress_bar_->setFormat(tr("Error"));
         set_status_text(tr("Error"));
@@ -465,7 +520,10 @@ void MainWindow::on_sync_clicked() {
     }
 }
 
-bool MainWindow::confirm_synchronize() {
+bool MainWindow::confirm_synchronize(bool delete_extraneous) {
+    if (!delete_extraneous) {
+        return true;
+    }
     return confirmation_dialog::show(this);
 }
 

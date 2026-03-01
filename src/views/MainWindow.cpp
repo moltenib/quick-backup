@@ -21,6 +21,7 @@
 #include <QWidget>
 
 #include "views/ConfirmationDialog.hpp"
+#include "views/WelcomeDialog.hpp"
 #include "utils/AppSetup.hpp"
 #include "utils/DurationFormat.hpp"
 #include "utils/Settings.hpp"
@@ -193,6 +194,7 @@ MainWindow::MainWindow(const std::string& icon_name)
         "browse-destination",
         central);
 
+    const bool has_settings_file = std::filesystem::exists(settings::settings_file_path());
     const settings::Settings last_settings = settings::load();
     if (!last_settings.origin.empty()) {
         origin_chooser_->setPath(QString::fromStdString(last_settings.origin));
@@ -333,6 +335,12 @@ MainWindow::MainWindow(const std::string& icon_name)
         stop_requested_ = false;
         set_running_state(false);
     });
+
+    if (!has_settings_file) {
+        QTimer::singleShot(0, this, [this]() {
+            WelcomeDialog::show(this);
+        });
+    }
 }
 
 MainWindow::~MainWindow() {
@@ -458,17 +466,7 @@ void MainWindow::on_sync_clicked() {
 }
 
 bool MainWindow::confirm_synchronize() {
-    const QString body_text = tr(
-        "This is a one-way synchronization. The origin will remain unchanged, and any files in the destination "
-        "folder that do not exist in the origin will be deleted.\n\n"
-        "By continuing, you confirm that the selected paths are correct, and that you accept your responsibility "
-        "for any data loss under applicable law.");
-    return confirmation_dialog::show(
-        this,
-        tr("Notice"),
-        tr("WARNING: POSSIBLE DATA LOSS!"),
-        body_text,
-        tr("I understand the risk, continue"));
+    return confirmation_dialog::show(this);
 }
 
 bool MainWindow::validate_inputs(std::string& origin, std::string& destination) {

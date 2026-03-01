@@ -2,6 +2,29 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="it_IT">
 <context>
+    <name>ConfirmationDialog</name>
+    <message>
+        <source>Notice</source>
+        <translation>Avviso</translation>
+    </message>
+    <message>
+        <source>WARNING: POSSIBLE DATA LOSS!</source>
+        <translation>ATTENZIONE: POSSIBILE PERDITA DI DATI</translation>
+    </message>
+    <message>
+        <source>This is a one-way synchronization. The origin will remain unchanged, and any files in the destination folder that do not exist in the origin will be deleted.
+
+By continuing, you confirm that the selected paths are correct, and that you accept your responsibility for any data loss under applicable law.</source>
+        <translation>Questa è una sincronizzazione unidirezionale. L&apos;origine rimarrà invariata e tutti i file nella cartella di destinazione che non esistono nell&apos;origine verranno eliminati.
+
+Continuando, conferma che i percorsi selezionati sono corretti e che si assume la responsabilità per eventuali perdite di dati ai sensi della legge applicabile.</translation>
+    </message>
+    <message>
+        <source>I understand the risk, continue</source>
+        <translation>Comprendo il rischio, continuare</translation>
+    </message>
+</context>
+<context>
     <name>DirectoryChooserWidget</name>
     <message>
         <source>Select</source>
@@ -107,14 +130,6 @@
         <translation>Errore di sincronizzazione</translation>
     </message>
     <message>
-        <source>Notice</source>
-        <translation>Avviso</translation>
-    </message>
-    <message>
-        <source>WARNING: POSSIBLE DATA LOSS!</source>
-        <translation>ATTENZIONE: POSSIBILE PERDITA DI DATI</translation>
-    </message>
-    <message>
         <source>Please choose both origin and destination folders.</source>
         <translation>Seleziona sia la cartella di origine sia quella di destinazione.</translation>
     </message>
@@ -133,18 +148,6 @@
     <message>
         <source>Destination folder does not exist: %1</source>
         <translation>La cartella di destinazione non esiste: %1</translation>
-    </message>
-    <message>
-        <source>This is a one-way synchronization. The origin will remain unchanged, and any files in the destination folder that do not exist in the origin will be deleted.
-
-By continuing, you confirm that the selected paths are correct, and that you accept your responsibility for any data loss under applicable law.</source>
-        <translation>Questa è una sincronizzazione unidirezionale. L&apos;origine rimarrà invariata e tutti i file nella cartella di destinazione che non esistono nell&apos;origine verranno eliminati.
-
-Proseguendo, conferma che i percorsi selezionati sono corretti e che si assume la responsabilità per eventuali perdite di dati ai sensi della legge applicabile.</translation>
-    </message>
-    <message>
-        <source>I understand the risk, continue</source>
-        <translation>Comprendo il rischio, proseguire</translation>
     </message>
 </context>
 <context>
@@ -172,6 +175,17 @@ Proseguendo, conferma che i percorsi selezionati sono corretti e che si assume l
     <message>
         <source>Could not find rsync. Set SIMPLE_MIRROR_RSYNC, add rsync to PATH, or bundle &quot;runtime/bin/rsync&quot;.</source>
         <translation>Impossibile trovare rsync. Impostare SIMPLE_MIRROR_RSYNC, aggiungere rsync al PATH oppure includere &quot;runtime/bin/rsync&quot;.</translation>
+    </message>
+</context>
+<context>
+    <name>WelcomeDialog</name>
+    <message>
+        <source>Welcome!</source>
+        <translation>Benvenuto!</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;It appears that no backups have been performed with this installation yet. How it works:&lt;/p&gt;&lt;p&gt;&lt;span class=&apos;accent&apos;&gt;1)&lt;/span&gt; Choose an origin. This is the folder to be backed up. It will not be modified by this program.&lt;/p&gt;&lt;p&gt;&lt;span class=&apos;accent&apos;&gt;2)&lt;/span&gt; Insert a back-up medium, like an external drive. This will be the destination.&lt;/p&gt;&lt;p&gt;&lt;span class=&apos;accent&apos;&gt;3)&lt;/span&gt; Press &lt;span class=&apos;accent&apos;&gt;&amp;quot;Synchronize&amp;quot;&lt;/span&gt; to turn the destination into a mirror of the origin. This is irreversible. Use with care!&lt;/p&gt;&lt;ul style=&apos;margin-top: 0px;&apos;&gt;&lt;li&gt;The two folders are compared.&lt;/li&gt;&lt;li&gt;Files in the destination that do not exist in the origin will be &lt;span style=&apos;color: #b51616; font-weight: 600;&apos;&gt;permanently deleted&lt;/span&gt;.&lt;/li&gt;&lt;li&gt;Files in the origin that are missing in the destination are copied from the origin.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;span class=&apos;accent&apos;&gt;Tip&lt;/span&gt;: Holding Shift will turn &amp;quot;Synchronize&amp;quot; into &lt;span class=&apos;accent&apos;&gt;&amp;quot;Combine&amp;quot;&lt;/span&gt;; the contents of the destination are kept and merged with the origin&apos;s. Use this option if it fits your goals.&lt;br&gt;&lt;br&gt;This message will disappear after the first run.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Sembra che con questa installazione non sia ancora stato eseguito alcun backup. Ecco come funziona:&lt;/p&gt;&lt;p&gt;&lt;span class=&apos;accent&apos;&gt;1)&lt;/span&gt; Scelga una cartella di origine. È la cartella da salvare. Questo programma non la modificherà.&lt;/p&gt;&lt;p&gt;&lt;span class=&apos;accent&apos;&gt;2)&lt;/span&gt; Colleghi un supporto di backup, ad esempio un&apos;unità esterna. Quella sarà la destinazione.&lt;/p&gt;&lt;p&gt;&lt;span class=&apos;accent&apos;&gt;3)&lt;/span&gt; Prema &lt;span class=&apos;accent&apos;&gt;«Sincronizza»&lt;/span&gt; per trasformare la destinazione in uno specchio dell&apos;origine. Questa operazione è irreversibile. La usi con cautela.&lt;/p&gt;&lt;ul style=&apos;margin-top: 0px;&apos;&gt;&lt;li&gt;Le due cartelle vengono confrontate.&lt;/li&gt;&lt;li&gt;I file nella destinazione che non esistono nell&apos;origine saranno &lt;span style=&apos;color: #b51616; font-weight: 600;&apos;&gt;eliminati in modo permanente&lt;/span&gt;.&lt;/li&gt;&lt;li&gt;I file presenti nell&apos;origine ma mancanti nella destinazione vengono copiati dall&apos;origine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;span class=&apos;accent&apos;&gt;Suggerimento&lt;/span&gt;: Se tiene premuto Maiusc, «Sincronizza» diventa &lt;span class=&apos;accent&apos;&gt;«Combina»&lt;/span&gt;; il contenuto della destinazione viene mantenuto e unito a quello dell&apos;origine. Usi questa opzione se è adatta al suo obiettivo.&lt;br&gt;&lt;br&gt;Questo messaggio scomparirà dopo la prima esecuzione.&lt;/p&gt;</translation>
     </message>
 </context>
 </TS>

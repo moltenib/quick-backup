@@ -2,6 +2,29 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fr_FR">
 <context>
+    <name>ConfirmationDialog</name>
+    <message>
+        <source>Notice</source>
+        <translation>Avertissement</translation>
+    </message>
+    <message>
+        <source>WARNING: POSSIBLE DATA LOSS!</source>
+        <translation>AVERTISSEMENT : PERTE DE DONNÉES POSSIBLE</translation>
+    </message>
+    <message>
+        <source>This is a one-way synchronization. The origin will remain unchanged, and any files in the destination folder that do not exist in the origin will be deleted.
+
+By continuing, you confirm that the selected paths are correct, and that you accept your responsibility for any data loss under applicable law.</source>
+        <translation>Il s&apos;agit d&apos;une synchronisation unidirectionnelle. Le dossier source restera inchangé et tous les fichiers du dossier de destination qui n&apos;existent pas dans le dossier source seront supprimés.
+
+En continuant, vous confirmez que les chemins sélectionnés sont corrects et que vous acceptez votre responsabilité en cas de perte de données au regard du droit applicable.</translation>
+    </message>
+    <message>
+        <source>I understand the risk, continue</source>
+        <translation>Je comprends le risque, continuer</translation>
+    </message>
+</context>
+<context>
     <name>DirectoryChooserWidget</name>
     <message>
         <source>Select</source>
@@ -107,14 +130,6 @@
         <translation>Erreur de synchronisation</translation>
     </message>
     <message>
-        <source>Notice</source>
-        <translation>Avertissement</translation>
-    </message>
-    <message>
-        <source>WARNING: POSSIBLE DATA LOSS!</source>
-        <translation>AVERTISSEMENT : PERTE DE DONNÉES POSSIBLE</translation>
-    </message>
-    <message>
         <source>Please choose both origin and destination folders.</source>
         <translation>Veuillez sélectionner les dossiers d&apos;origine et de destination.</translation>
     </message>
@@ -133,18 +148,6 @@
     <message>
         <source>Destination folder does not exist: %1</source>
         <translation>Le dossier de destination n&apos;existe pas : %1</translation>
-    </message>
-    <message>
-        <source>This is a one-way synchronization. The origin will remain unchanged, and any files in the destination folder that do not exist in the origin will be deleted.
-
-By continuing, you confirm that the selected paths are correct, and that you accept your responsibility for any data loss under applicable law.</source>
-        <translation>Il s&apos;agit d&apos;une synchronisation unidirectionnelle. Le dossier source restera inchangé et tous les fichiers du dossier de destination qui n&apos;existent pas dans le dossier source seront supprimés.
-
-En continuant, vous confirmez que les chemins sélectionnés sont corrects et que vous acceptez votre responsabilité en cas de perte de données au regard du droit applicable.</translation>
-    </message>
-    <message>
-        <source>I understand the risk, continue</source>
-        <translation>Je comprends le risque, continuer</translation>
     </message>
 </context>
 <context>
@@ -172,6 +175,17 @@ En continuant, vous confirmez que les chemins sélectionnés sont corrects et qu
     <message>
         <source>Could not find rsync. Set SIMPLE_MIRROR_RSYNC, add rsync to PATH, or bundle &quot;runtime/bin/rsync&quot;.</source>
         <translation>Impossible de trouver rsync. Définissez SIMPLE_MIRROR_RSYNC, ajoutez rsync au PATH, ou incluez &quot;runtime/bin/rsync&quot;.</translation>
+    </message>
+</context>
+<context>
+    <name>WelcomeDialog</name>
+    <message>
+        <source>Welcome!</source>
+        <translation>Bienvenue !</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;It appears that no backups have been performed with this installation yet. How it works:&lt;/p&gt;&lt;p&gt;&lt;span class=&apos;accent&apos;&gt;1)&lt;/span&gt; Choose an origin. This is the folder to be backed up. It will not be modified by this program.&lt;/p&gt;&lt;p&gt;&lt;span class=&apos;accent&apos;&gt;2)&lt;/span&gt; Insert a back-up medium, like an external drive. This will be the destination.&lt;/p&gt;&lt;p&gt;&lt;span class=&apos;accent&apos;&gt;3)&lt;/span&gt; Press &lt;span class=&apos;accent&apos;&gt;&amp;quot;Synchronize&amp;quot;&lt;/span&gt; to turn the destination into a mirror of the origin. This is irreversible. Use with care!&lt;/p&gt;&lt;ul style=&apos;margin-top: 0px;&apos;&gt;&lt;li&gt;The two folders are compared.&lt;/li&gt;&lt;li&gt;Files in the destination that do not exist in the origin will be &lt;span style=&apos;color: #b51616; font-weight: 600;&apos;&gt;permanently deleted&lt;/span&gt;.&lt;/li&gt;&lt;li&gt;Files in the origin that are missing in the destination are copied from the origin.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;span class=&apos;accent&apos;&gt;Tip&lt;/span&gt;: Holding Shift will turn &amp;quot;Synchronize&amp;quot; into &lt;span class=&apos;accent&apos;&gt;&amp;quot;Combine&amp;quot;&lt;/span&gt;; the contents of the destination are kept and merged with the origin&apos;s. Use this option if it fits your goals.&lt;br&gt;&lt;br&gt;This message will disappear after the first run.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Il semble qu&apos;aucune sauvegarde n&apos;ait encore été effectuée avec cette installation. Voici le fonctionnement :&lt;/p&gt;&lt;p&gt;&lt;span class=&apos;accent&apos;&gt;1)&lt;/span&gt; Choisissez une source. C&apos;est le dossier à sauvegarder. Ce dossier ne sera pas modifié par ce programme.&lt;/p&gt;&lt;p&gt;&lt;span class=&apos;accent&apos;&gt;2)&lt;/span&gt; Branchez un support de sauvegarde, par exemple un disque externe. Ce sera la destination.&lt;/p&gt;&lt;p&gt;&lt;span class=&apos;accent&apos;&gt;3)&lt;/span&gt; Cliquez sur &lt;span class=&apos;accent&apos;&gt;«Synchroniser»&lt;/span&gt; pour transformer la destination en miroir de la source. Cette action est irréversible. Utilisez-la avec prudence.&lt;/p&gt;&lt;ul style=&apos;margin-top: 0px;&apos;&gt;&lt;li&gt;Les deux dossiers sont comparés.&lt;/li&gt;&lt;li&gt;Les fichiers du dossier de destination qui n&apos;existent pas dans le dossier source sont &lt;span style=&apos;color: #b51616; font-weight: 600;&apos;&gt;supprimés définitivement&lt;/span&gt;.&lt;/li&gt;&lt;li&gt;Les fichiers du dossier source absents du dossier de destination sont copiés depuis le dossier source.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;span class=&apos;accent&apos;&gt;Astuce&lt;/span&gt; : en maintenant la touche Maj enfoncée, «Synchroniser» devient &lt;span class=&apos;accent&apos;&gt;«Fusionner»&lt;/span&gt; ; le contenu de la destination est conservé et fusionné avec celui de la source. Utilisez cette option si elle correspond à votre objectif.&lt;br&gt;&lt;br&gt;Ce message disparaîtra après la première exécution.&lt;/p&gt;</translation>
     </message>
 </context>
 </TS>

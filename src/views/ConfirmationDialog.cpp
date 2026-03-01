@@ -1,18 +1,26 @@
 #include "views/ConfirmationDialog.hpp"
 
 #include <QAbstractButton>
+#include <QCoreApplication>
 #include <QMessageBox>
 #include <QString>
 #include <QWidget>
 
 namespace confirmation_dialog {
 
-bool show(
-    QWidget* parent,
-    const QString& title,
-    const QString& warning_text,
-    const QString& body_text,
-    const QString& accept_button_text) {
+bool show(QWidget* parent) {
+    const QString title = QCoreApplication::translate("ConfirmationDialog", "Notice");
+    const QString warning_text = QCoreApplication::translate("ConfirmationDialog", "WARNING: POSSIBLE DATA LOSS!");
+    const QString body_text = QCoreApplication::translate(
+        "ConfirmationDialog",
+        "This is a one-way synchronization. The origin will remain unchanged, and any files in the destination "
+        "folder that do not exist in the origin will be deleted.\n\n"
+        "By continuing, you confirm that the selected paths are correct, and that you accept your responsibility "
+        "for any data loss under applicable law.");
+    const QString accept_button_text = QCoreApplication::translate(
+        "ConfirmationDialog",
+        "I understand the risk, continue");
+
     QMessageBox dialog(parent);
     dialog.setWindowTitle(title);
     dialog.setIcon(QMessageBox::Warning);

@@ -18,8 +18,9 @@ UNAME_S := $(shell uname -s 2>/dev/null || echo)
 IS_WINDOWS := $(if $(filter Windows_NT,$(OS))$(filter MSYS% MINGW% CYGWIN%,$(UNAME_S)),1,0)
 WINDOWS_ENV_MSG := only available in a Windows/MSYS2 environment
 
-SRC := src/main.cpp src/views/MainWindow.cpp src/views/ConfirmationDialog.cpp src/views/WelcomeDialog.cpp src/controllers/RsyncRunner.cpp src/views/DirectoryChooserWidget.cpp src/utils/AppSetup.cpp src/utils/Settings.cpp src/utils/DurationFormat.cpp
+SRC := src/main.cpp src/views/MainWindow.cpp src/views/MainWindowMisc.cpp src/views/SyncButton.cpp src/views/ProgressBarWidget.cpp src/views/StatusBarWidget.cpp src/views/ConfirmationDialog.cpp src/views/WelcomeDialog.cpp src/controllers/RsyncRunner.cpp src/views/DirectoryChooserWidget.cpp src/utils/AppSetup.cpp src/utils/Settings.cpp src/utils/DurationFormat.cpp
 OBJ := $(SRC:.cpp=.o)
+DEP := $(OBJ:.o=.d)
 
 LOCALE_TS_FILES := $(wildcard resources/locales/*/LC_MESSAGES/simple-mirror.ts)
 QM_FILES := $(patsubst %/simple-mirror.ts,%/simple-mirror.qm,$(LOCALE_TS_FILES))
@@ -65,7 +66,7 @@ endif
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(OBJ) $(WIN_ICON_LINK_OBJ) $(QT_LIBS)
 
 src/%.o: src/%.cpp
-	$(CXX) $(CXXFLAGS) $(QT_CFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(QT_CFLAGS) -MMD -MP -c $< -o $@
 
 translations: $(QM_FILES)
 
@@ -149,6 +150,7 @@ run: $(BIN)
 
 clean:
 	find src -name '*.o' -delete
+	find src -name '*.d' -delete
 	rm -f "$(WIN_ICON_OBJ)"
 	rm -f $(BIN) $(QM_FILES)
 
@@ -161,3 +163,5 @@ clean-bundle:
 
 windows-clean-deploy:
 	rm -rf "$(WIN_DEPLOY_DIR)"
+
+-include $(DEP)

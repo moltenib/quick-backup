@@ -5,9 +5,9 @@
 #include <QGridLayout>
 #include <QIcon>
 #include <QMessageBox>
-#include <QScreen>
 #include <QSpacerItem>
 #include <QString>
+#include <QTimer>
 #include <QWidget>
 
 void WelcomeDialog::show(QWidget* parent) {
@@ -27,6 +27,7 @@ void WelcomeDialog::show(QWidget* parent) {
     }
 
     dialog.setWindowTitle(QCoreApplication::translate("WelcomeDialog", "Welcome!"));
+    dialog.setWindowModality(Qt::WindowModal);
     dialog.setTextFormat(Qt::RichText);
     const QString accent_style =
         "<style>.accent { color: #2f8adf; font-weight: 600; }</style>";
@@ -55,22 +56,14 @@ void WelcomeDialog::show(QWidget* parent) {
     dialog.setStandardButtons(QMessageBox::Ok);
     dialog.setDefaultButton(QMessageBox::Ok);
 
-    dialog.ensurePolished();
-    dialog.adjustSize();
-
-    QRect target_geometry;
-    if (parent) {
-        target_geometry = parent->frameGeometry();
-    } else if (QScreen* screen = QApplication::primaryScreen()) {
-        target_geometry = screen->availableGeometry();
-    }
-
-    if (!target_geometry.isNull()) {
-        const QRect dialog_geometry = dialog.frameGeometry();
-        const int x = target_geometry.center().x() - (dialog_geometry.width() / 2);
-        const int y = target_geometry.center().y() - (dialog_geometry.height() / 2);
-        dialog.move(x, y);
-    }
+    QTimer::singleShot(0, &dialog, [&dialog, parent]() {
+        if (!parent || !parent->isVisible()) {
+            return;
+        }
+        QRect dialog_geometry = dialog.frameGeometry();
+        dialog_geometry.moveCenter(parent->frameGeometry().center());
+        dialog.move(dialog_geometry.topLeft());
+    });
 
     dialog.exec();
 }

@@ -7,18 +7,10 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPropertyAnimation>
-#include <QProgressBar>
-#include <QPushButton>
-#include <QSizePolicy>
-#include <QScreen>
-#include <QFontMetrics>
 #include <QApplication>
 #include <QGuiApplication>
 #include <QKeyEvent>
 #include <QEvent>
-#include <QLayout>
-#include <QStyle>
-#include <QStatusBar>
 #include <QTimer>
 #include <QCloseEvent>
 #include <QEventLoop>
@@ -26,145 +18,20 @@
 #include <QWidget>
 
 #include "views/ConfirmationDialog.hpp"
+#include "views/MainWindowMisc.hpp"
+#include "views/ProgressBarWidget.hpp"
+#include "views/StatusBarWidget.hpp"
+#include "views/SyncButton.hpp"
 #include "views/WelcomeDialog.hpp"
 #include "utils/AppSetup.hpp"
 #include "utils/DurationFormat.hpp"
 #include "utils/Settings.hpp"
-
-namespace {
-
-const char* kAppStyle = R"QSS(
-#main-window {
-  background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #0b0f13, stop:1 #071622);
-}
-
-QLabel#origin-label,
-QLabel#destination-label {
-  color: #d6ecff;
-}
-
-QLineEdit#origin-edit,
-QLineEdit#destination-edit {
-  color: #e7f3ff;
-  background-color: #0d1f2a;
-  border: 1px solid #20506f;
-  border-radius: 6px;
-  padding: 4px;
-}
-
-QLineEdit#origin-edit[placeholderStyled="true"],
-QLineEdit#destination-edit[placeholderStyled="true"] {
-  font-style: italic;
-  font-size: 90%;
-}
-
-QPushButton#browse-origin,
-QPushButton#browse-destination,
-QPushButton#sync-button {
-  color: #e7f3ff;
-  background-color: #0d1f2a;
-  border: 1px solid #20506f;
-  border-radius: 6px;
-  padding: 6px 10px;
-}
-
-QPushButton#browse-origin,
-QPushButton#browse-destination {
-  color: #e7f3ff;
-  background-color: #0d1f2a;
-  border: 1px solid #20506f;
-}
-
-QPushButton#browse-origin[syncRunning="true"],
-QPushButton#browse-destination[syncRunning="true"] {
-  color: #a9a9a9;
-  background-color: #2b2b2b;
-  border: 1px solid #4a4a4a;
-}
-
-QPushButton#browse-origin:enabled:hover,
-QPushButton#browse-destination:enabled:hover {
-  color: #e7f3ff;
-  background-color: #06121c;
-  border: 1px solid #173d53;
-}
-
-QPushButton#browse-origin:disabled,
-QPushButton#browse-destination:disabled {
-  color: #a9a9a9;
-  background-color: #2b2b2b;
-  border: 1px solid #4a4a4a;
-}
-
-QPushButton#sync-button {
-  font-weight: 700;
-  background-color: #b51616;
-  border: 1px solid #ff4d4d;
-  color: #fff1f1;
-}
-
-QPushButton#sync-button:enabled:hover {
-  background-color: #8f1010;
-  border: 1px solid #d33b3b;
-}
-
-QPushButton#sync-button[combineMode="true"] {
-  background-color: #1f4f7a;
-  border: 1px solid #2f8adf;
-  color: #e7f3ff;
-}
-
-QPushButton#sync-button[combineMode="true"]:enabled:hover {
-  background-color: #173d61;
-  border: 1px solid #5ea7eb;
-}
-
-QProgressBar#progress-bar {
-  color: #e7f3ff;
-  border: 1px solid #14344a;
-  border-radius: 6px;
-  background: #1b1b1b;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-}
-
-QProgressBar#progress-bar::chunk {
-  background: #b51616;
-  border-radius: 6px;
-}
-
-QStatusBar#status-bar {
-  color: #e7f3ff;
-  background: transparent;
-  border: none;
-  padding: 0;
-  margin: 0;
-}
-
-QStatusBar#status-bar::item {
-  border: none;
-  padding: 0;
-  margin: 0;
-}
-
-QLabel#status-label {
-  color: #e7f3ff;
-  background: transparent;
-  font-size: 112%;
-  padding: 0;
-  margin: 0;
-}
-)QSS";
-
-}  // namespace
 
 MainWindow::MainWindow(const std::string& icon_name)
     : origin_chooser_(nullptr),
       destination_chooser_(nullptr),
       sync_button_(nullptr),
       status_bar_(nullptr),
-      status_label_(nullptr),
       pending_status_text_(),
       status_update_scheduled_(false),
       progress_bar_(nullptr),
@@ -232,20 +99,7 @@ MainWindow::MainWindow(const std::string& icon_name)
     directory_column->addWidget(origin_chooser_);
     directory_column->addWidget(destination_chooser_);
 
-    sync_button_ = new QPushButton(tr("Synchronize"), central);
-    sync_button_->setObjectName("sync-button");
-    sync_button_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-    const QFontMetrics metrics(sync_button_->font());
-    const QString synchronize_text = tr("Synchronize");
-    const QString combine_text = tr("Combine");
-    const QString stop_text = tr("Stop");
-    const int min_button_width = std::max(
-                                     std::max(
-                                         metrics.horizontalAdvance(synchronize_text),
-                                         metrics.horizontalAdvance(combine_text)),
-                                     metrics.horizontalAdvance(stop_text)) +
-                                 32;
-    sync_button_->setMinimumWidth(min_button_width);
+    sync_button_ = new SyncButton(central);
 
     auto* sync_column = new QVBoxLayout();
     sync_column->setSpacing(6);
@@ -255,34 +109,12 @@ MainWindow::MainWindow(const std::string& icon_name)
     top_row->addLayout(directory_column, 1);
     top_row->addLayout(sync_column);
 
-    progress_bar_ = new QProgressBar(central);
-    progress_bar_->setObjectName("progress-bar");
-    progress_bar_->setRange(0, 100);
-    progress_bar_->setValue(0);
-    progress_bar_->setFormat(tr("Idle"));
+    progress_bar_ = new ProgressBarWidget(central);
     progress_animation_ = new QPropertyAnimation(progress_bar_, "value", this);
     progress_animation_->setDuration(180);
     progress_animation_->setEasingCurve(QEasingCurve::OutCubic);
 
-    status_bar_ = new QStatusBar(central);
-    status_bar_->setObjectName("status-bar");
-    status_bar_->setSizeGripEnabled(false);
-    status_bar_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    status_bar_->setContentsMargins(0, 0, 0, 0);
-    if (QLayout* status_layout = status_bar_->layout()) {
-        status_layout->setContentsMargins(0, 0, 0, 0);
-        status_layout->setSpacing(0);
-    }
-
-    status_label_ = new QLabel(status_bar_);
-    status_label_->setObjectName("status-label");
-    status_label_->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-    status_label_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    QFont status_font = status_label_->font();
-    status_font.setPointSizeF(status_font.pointSizeF() * 1.1);
-    status_label_->setFont(status_font);
-    status_label_->setContentsMargins(0, 0, 0, 0);
-    status_bar_->addWidget(status_label_, 1);
+    status_bar_ = new StatusBarWidget(central);
 
     main_layout->addLayout(top_row);
     main_layout->addWidget(status_bar_, 1);
@@ -390,7 +222,9 @@ void MainWindow::closeEvent(QCloseEvent* event) {
     event->accept();
 }
 
+// Detect Shift press
 bool MainWindow::eventFilter(QObject* watched, QEvent* event) {
+    Q_UNUSED(watched);
     if (!runner_.is_running() && event &&
         (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease)) {
         auto* key_event = static_cast<QKeyEvent*>(event);
@@ -402,11 +236,11 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event) {
 }
 
 void MainWindow::apply_stylesheet() {
-    setStyleSheet(kAppStyle);
+    window_style_.applyTo(*this);
 }
 
 void MainWindow::set_status_text(const QString& text) {
-    if (!status_label_) {
+    if (!status_bar_) {
         return;
     }
 
@@ -423,11 +257,11 @@ void MainWindow::set_status_text(const QString& text) {
     status_update_scheduled_ = true;
     QTimer::singleShot(0, this, [this]() {
         status_update_scheduled_ = false;
-        if (!status_label_) {
+        if (!status_bar_) {
             return;
         }
-        if (status_label_->text() != pending_status_text_) {
-            status_label_->setText(pending_status_text_);
+        if (status_bar_->statusText() != pending_status_text_) {
+            status_bar_->setStatusText(pending_status_text_);
         }
     });
 }
@@ -461,21 +295,8 @@ void MainWindow::set_running_state(bool running) {
 }
 
 void MainWindow::update_sync_button_text(bool running) {
-    if (!sync_button_) {
-        return;
-    }
     const bool combine_mode = !running && combine_mode_requested();
-    if (sync_button_->property("combineMode").toBool() != combine_mode) {
-        sync_button_->setProperty("combineMode", combine_mode);
-        sync_button_->style()->unpolish(sync_button_);
-        sync_button_->style()->polish(sync_button_);
-        sync_button_->update();
-    }
-    if (running) {
-        sync_button_->setText(tr("Stop"));
-        return;
-    }
-    sync_button_->setText(combine_mode ? tr("Combine") : tr("Synchronize"));
+    sync_button_->setRunningState(running, combine_mode);
 }
 
 bool MainWindow::combine_mode_requested() const {

@@ -8,16 +8,16 @@
 
 #include "controllers/RsyncRunner.hpp"
 #include "views/DirectoryChooserWidget.hpp"
+#include "views/MainWindowMisc.hpp"
 
-class QPushButton;
-class QProgressBar;
-class QLabel;
 class QPropertyAnimation;
-class QStatusBar;
 class QString;
 class QCloseEvent;
 class QObject;
 class QEvent;
+class ProgressBarWidget;
+class StatusBarWidget;
+class SyncButton;
 
 class MainWindow : public QMainWindow {
 public:
@@ -44,14 +44,14 @@ private:
     bool validate_inputs(std::string& origin, std::string& destination);
     void show_error(const QString& message, const QString& title = QString());
 
+    MainWindowStyle window_style_;
     DirectoryChooserWidget* origin_chooser_;
     DirectoryChooserWidget* destination_chooser_;
-    QPushButton* sync_button_;
-    QStatusBar* status_bar_;
-    QLabel* status_label_;
+    SyncButton* sync_button_;
+    StatusBarWidget* status_bar_;
     QString pending_status_text_;
     bool status_update_scheduled_;
-    QProgressBar* progress_bar_;
+    ProgressBarWidget* progress_bar_;
     QPropertyAnimation* progress_animation_;
     int last_progress_percent_;
     bool stop_requested_;

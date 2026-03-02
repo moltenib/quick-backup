@@ -25,6 +25,8 @@ InstallDir "$PROGRAMFILES64\Simple Mirror"
 InstallDirRegKey HKLM "Software\Simple Mirror" "Install_Dir"
 
 !define MUI_ABORTWARNING
+!define MUI_WELCOMEFINISHPAGE_BITMAP ""
+!define MUI_HEADERIMAGE_BITMAP ""
 !insertmacro MUI_RESERVEFILE_LANGDLL
 !define MUI_FINISHPAGE_RUN
 !define MUI_FINISHPAGE_RUN_TEXT "$(RUN_APP_TEXT)"

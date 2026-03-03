@@ -2,16 +2,19 @@
 
 #include <QApplication>
 #include <QCoreApplication>
-#include <QGridLayout>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QHBoxLayout>
 #include <QIcon>
-#include <QMessageBox>
-#include <QSpacerItem>
+#include <QLabel>
 #include <QString>
-#include <QTimer>
+#include <QVBoxLayout>
 #include <QWidget>
 
 void WelcomeDialog::show(QWidget* parent) {
-    QMessageBox dialog(parent);
+    QDialog dialog(parent);
+    dialog.setObjectName("welcome-dialog");
+
     QIcon dialog_icon;
     if (parent && !parent->windowIcon().isNull()) {
         dialog_icon = parent->windowIcon();
@@ -21,17 +24,14 @@ void WelcomeDialog::show(QWidget* parent) {
 
     if (!dialog_icon.isNull()) {
         dialog.setWindowIcon(dialog_icon);
-        dialog.setIconPixmap(dialog_icon.pixmap(48, 48));
-    } else {
-        dialog.setIcon(QMessageBox::Information);
     }
 
     dialog.setWindowTitle(QCoreApplication::translate("WelcomeDialog", "Welcome!"));
     dialog.setWindowModality(Qt::WindowModal);
-    dialog.setTextFormat(Qt::RichText);
+
     const QString accent_style =
         "<style>.accent { color: #2f8adf; font-weight: 600; }</style>";
-    dialog.setText(accent_style + QCoreApplication::translate(
+    const QString body_text = accent_style + QCoreApplication::translate(
         "WelcomeDialog",
         "<p>It appears that no backups have been performed with this installation yet. How it works:</p>"
         "<p><span class='accent'>1)</span> Choose an origin. This is the folder to be backed up. It will not be modified by this "
@@ -48,22 +48,45 @@ void WelcomeDialog::show(QWidget* parent) {
         "<p><span class='accent'>Tip</span>: Holding Shift will turn "
         "&quot;Synchronize&quot; into <span class='accent'>&quot;Combine&quot;</span>; "
         "the contents of the destination are kept and merged with the origin's. Use this option if it fits your "
-        "goals.<br><br>This message will disappear after the first run.</p>"));
-    if (QGridLayout* layout = qobject_cast<QGridLayout*>(dialog.layout())) {
-        auto* width_spacer = new QSpacerItem(650, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-        layout->addItem(width_spacer, layout->rowCount(), 0, 1, layout->columnCount());
-    }
-    dialog.setStandardButtons(QMessageBox::Ok);
-    dialog.setDefaultButton(QMessageBox::Ok);
+        "goals.<br><br>This message will disappear after the first run.</p>");
 
-    QTimer::singleShot(0, &dialog, [&dialog, parent]() {
-        if (!parent || !parent->isVisible()) {
-            return;
-        }
+    auto* main_layout = new QVBoxLayout(&dialog);
+    main_layout->setContentsMargins(12, 12, 12, 12);
+    main_layout->setSpacing(8);
+
+    auto* content_layout = new QHBoxLayout();
+    content_layout->setContentsMargins(0, 0, 0, 0);
+    content_layout->setSpacing(12);
+
+    auto* icon_label = new QLabel(&dialog);
+    icon_label->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+    icon_label->setFixedWidth(56);
+    if (!dialog_icon.isNull()) {
+        icon_label->setPixmap(dialog_icon.pixmap(48, 48));
+    }
+
+    auto* text_label = new QLabel(&dialog);
+    text_label->setTextFormat(Qt::RichText);
+    text_label->setWordWrap(true);
+    text_label->setText(body_text);
+    text_label->setTextInteractionFlags(Qt::TextSelectableByMouse);
+
+    content_layout->addWidget(icon_label, 0, Qt::AlignTop);
+    content_layout->addWidget(text_label, 1);
+    main_layout->addLayout(content_layout);
+
+    auto* button_box = new QDialogButtonBox(QDialogButtonBox::Ok, &dialog);
+    QObject::connect(button_box, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    main_layout->addWidget(button_box);
+
+    dialog.setFixedWidth(700);
+    dialog.adjustSize();
+
+    if (parent && parent->isVisible()) {
         QRect dialog_geometry = dialog.frameGeometry();
         dialog_geometry.moveCenter(parent->frameGeometry().center());
         dialog.move(dialog_geometry.topLeft());
-    });
+    }
 
     dialog.exec();
 }

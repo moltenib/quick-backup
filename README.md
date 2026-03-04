@@ -61,13 +61,13 @@ make windows-deploy
 Create an installer:
 
 ```bash
-make APP_VERSION=1.0.0 windows-installer
+make windows-installer
 ```
 
 Outputs:
 
 - `dist/simple-mirror.exe`
-- `simple-mirror-setup-1.0.0.exe`
+- `simple-mirror-setup-<version>.exe` (from `VERSION`)
 
 ## Icons
 

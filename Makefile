@@ -4,7 +4,6 @@ PKG_CONFIG := pkg-config
 LRELEASE := lrelease
 WINDEPLOYQT ?= windeployqt6
 NSIS ?= makensis
-APP_VERSION ?= 1.0.0
 
 CXXFLAGS := -std=c++17 -Wall -Wextra -pedantic -fPIC -Isrc
 LDFLAGS :=
@@ -14,6 +13,12 @@ QT_LIBS := $(shell $(PKG_CONFIG) --libs Qt6Widgets)
 .DEFAULT_GOAL := all
 
 ROOT_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+VERSION_FILE := $(ROOT_DIR)/VERSION
+APP_VERSION ?= $(shell cat "$(VERSION_FILE)" 2>/dev/null | tr -d '\r\n')
+APP_VERSION := $(strip $(APP_VERSION))
+ifeq ($(APP_VERSION),)
+APP_VERSION := dev
+endif
 UNAME_S := $(shell uname -s 2>/dev/null || echo)
 IS_WINDOWS := $(if $(filter Windows_NT,$(OS))$(filter MSYS% MINGW% CYGWIN%,$(UNAME_S)),1,0)
 WINDOWS_ENV_MSG := only available in a Windows/MSYS2 environment

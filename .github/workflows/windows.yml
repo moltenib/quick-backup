@@ -76,7 +76,6 @@ jobs:
         with:
           name: windows-output
           path: |
-            dist/**
             simple-mirror-setup-*.exe
             manifest.json
 

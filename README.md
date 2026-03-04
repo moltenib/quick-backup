@@ -67,7 +67,7 @@ make windows-installer
 Outputs:
 
 - `dist/simple-mirror.exe`
-- `simple-mirror-setup-<version>.exe` (from `VERSION`)
+- `simple-mirror-setup-<version>.exe` (from `APP_VERSION`, default derived from `git describe`)
 
 ## Icons
 

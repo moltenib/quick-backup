@@ -13,8 +13,9 @@ QT_LIBS := $(shell $(PKG_CONFIG) --libs Qt6Widgets)
 .DEFAULT_GOAL := all
 
 ROOT_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
-VERSION_FILE := $(ROOT_DIR)/VERSION
-APP_VERSION ?= $(shell cat "$(VERSION_FILE)" 2>/dev/null | tr -d '\r\n')
+# Version used for installer filename and Windows "DisplayVersion"
+# Override via environment: `APP_VERSION=1.2.3 make windows-installer`
+APP_VERSION ?= $(shell cd "$(ROOT_DIR)" && (git describe --tags --dirty --always 2>/dev/null || true) | sed 's/^v//' | tr -d '\r\n')
 APP_VERSION := $(strip $(APP_VERSION))
 ifeq ($(APP_VERSION),)
 APP_VERSION := dev

@@ -13,7 +13,7 @@ As with `rsync`, the process is as follows:
 2) Files that do not exist in the destination are **removed** to keep the destination up to date.
 3) Files in the destination with a different modification date from those in the origin folder are overwritten.
 
-Of those, step **2** can be skipped by holding _Shift_. This turns the main button into "Combine" instead of "Synchronize." In the background, the command that is prepared is `rsync` **without** the `--delete` parameter. This will merge the contents of two directories into the destination rather than create a mirror of the origin.
+Of those, step **2** can be skipped by holding _Shift_ and clicking "Combine";  rather than create a mirror of the origin, this will merge the contents of two directories into the destination.
 
 ## Installation
 

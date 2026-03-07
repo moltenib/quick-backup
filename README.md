@@ -19,16 +19,6 @@ Of those, step **2** can be skipped by holding _Shift_. This turns the main butt
 
 A Windows installer based on the current state of the main branch can be downloaded from the Github artifacts ([link](https://github.com/moltenib/simple-mirror/actions/workflows/windows.yml)).
 
-## Compilation (if needed)
-
-To build the program locally, the dependencies below must be met:
-
-- `make`;
-- A C++17 compiler like `g++`;
-- `pkg-config`;
-- Qt6 Widgets;
-- `lrelease` (Qt Linguist tools).
-
 #### Unix-like systems (Linux, SteamOS)
 
 After cloning this repository, the build process on Linux only needs `make`. Ensure to have all dependencies.
@@ -40,6 +30,16 @@ On Arch Linux and derivatives, the latest Git version can be downloaded from the
 ```shell
 yay -S simple-mirror-git
 ```
+
+## Compilation
+
+To build the program locally, the dependencies below must be met:
+
+- `make`;
+- A C++17 compiler like `g++`;
+- `pkg-config`;
+- Qt6 Widgets;
+- `lrelease` (Qt Linguist tools).
 
 #### Windows build
 

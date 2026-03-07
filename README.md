@@ -1,39 +1,51 @@
 # Simple Mirror
 
-Qt GUI wrapper around `rsync -av --info=progress2 --delete` to mirror origin to destination
+## Introduction
 
-## Code layout
+This utility is meant to simplify `rsync` usage on both Windows and Linux. It is built upon the oficially supported Cygwin port of `rsync`, taking just as much time to mirror two directories. The following parameters are used:
 
-- `src/main.cpp`: app startup
-- `src/views/MainWindow.hpp` + `src/views/MainWindow.cpp`: main UI, validation, dialogs, progress
-- `src/views/DirectoryChooserWidget.hpp` + `src/views/DirectoryChooserWidget.cpp`: directory chooser row
-- `src/controllers/RsyncRunner.hpp` + `src/controllers/RsyncRunner.cpp`: rsync process and output parsing
-- `src/utils/AppSetup.hpp` + `src/utils/AppSetup.cpp`: icon and translation setup
+- Origin: the directory to be mirrored. It will not be altered by this program.
+- Destination: a directory to copy the differences into.
 
-## Build
+As with `rsync`, the process is as follows:
 
-Requirements:
+1) The two directories are compared.
+2) Files that do not exist in the destination are **removed** to keep the destination up to date.
+3) Files in the destination with a different modification date from those in the origin folder are overwritten.
 
-- `make`
-- C++17 compiler
-- `pkg-config`
-- Qt6 Widgets
-- `lrelease` (Qt Linguist tools)
+Of those, step **2** can be skipped by holding _Shift_. This turns the main button into "Combine" instead of "Synchronize." In the background, the command that is prepared is `rsync` **without** the `--delete` parameter. This is useful to merge the contents of two directories rather than create a mirror.
 
-Build:
+## Installation
 
-```bash
-make
+A Windows installer based on the current state of the main branch can be downloaded from the Github artifacts ([link](https://github.com/moltenib/simple-mirror/actions/workflows/windows.yml)).
+
+## Compilation (if needed)
+
+To build the program locally, the dependencies below must be met:
+
+- `make`;
+- A C++17 compiler like `g++`;
+- `pkg-config`;
+- Qt6 Widgets;
+- `lrelease` (Qt Linguist tools).
+
+#### Unix-like systems (Linux, SteamOS)
+
+After cloning this repository, the build process on Linux only needs `make`. Ensure to have all dependencies.
+
+##### Arch Linux and distributions with `pacman`
+
+On Arch Linux and derivatives, the latest Git version can be downloaded from the Arch User Repository ([link](https://aur.archlinux.org/packages/simple-mirror-git)).
+
+```shell
+yay -S simple-mirror-git
 ```
 
-## Windows Build Sequence
+#### Windows build
 
-Use the `MSYS2 MinGW64` shell in the repo root
-No `OS=Windows_NT` override is needed
+Compiling this program on Windows requires a MSYS2 MinGW64 environment. Dependencies must be installed as follows:
 
-Install dependencies once:
-
-```bash
+```shell
 pacman -S --needed \
   mingw-w64-x86_64-toolchain \
   mingw-w64-x86_64-pkgconf \
@@ -44,46 +56,39 @@ pacman -S --needed \
   nsis
 ```
 
-Build:
+###### Create a simple executable in `dist/`
 
 ```bash
 make clean
 make
 ```
 
-Create a runnable `dist` bundle with bundled `rsync`:
+###### Add DLL dependencies, including `rsync`
 
 ```bash
 make bundle-rsync
 make windows-deploy
 ```
 
-Create an installer:
+###### Create an installer
 
 ```bash
 make windows-installer
 ```
 
-Outputs:
+### Outputs:
 
 - `dist/simple-mirror.exe`
 - `simple-mirror-setup-<version>.exe` (from `APP_VERSION`, default derived from `git describe`)
 
-## Icons
-
-- Runtime app icon uses bundled files first:
-  - `resources/icons/icon.png`
-  - `resources/icons/icon.ico`
-- `make windows-deploy` copies `resources/icons` into `dist/resources/icons`
-- Installer UI and shortcut icons use `resources/icons/icon.ico` when present
-- Windows executable icon embedding is enabled when `resources/icons/icon.ico` exists
-
-Run:
+#### Run
 
 - Linux: `./simple-mirror`
 - Windows output: `dist/simple-mirror.exe`
 
-Targets:
+## Technical information
+
+### All `make` targets
 
 - `make run`: build and run
 - `make clean`: remove objects, binary, compiled `.qm`
@@ -96,14 +101,15 @@ Targets:
 - `make windows-all`: Windows pipeline (`all` + `windows-installer`, and auto `bundle-rsync` when no deploy lock is present)
 - `make windows-clean-deploy`: remove `dist/`
 
-## Translations
+
+### Translations
 
 Default language is English
 At startup, system locale is used if `resources/locales/<lang>/LC_MESSAGES/simple-mirror.qm` exists
 
 Included: `de`, `es`, `pt`, `it`, `nl`, `fr`, `zh_CN`, `ja`
 
-## Windows rsync resolution
+### Windows rsync resolution
 
 `rsync` is resolved in this order (relative to executable directory and current working directory):
 
@@ -112,19 +118,7 @@ Included: `de`, `es`, `pt`, `it`, `nl`, `fr`, `zh_CN`, `ja`
    - `runtime/msys2/usr/bin/rsync.exe`
    - `msys2/usr/bin/rsync.exe`
 
+### MSYS2 runtime
+
 On Windows, Simple Mirror requires an MSYS2-compatible `rsync` runtime (`msys-2.0.dll`)
 Random `PATH` rsync binaries are ignored to avoid mixed-runtime failures
-
-Rsync bundling is separate from normal build:
-
-- default: `make`
-- explicit bundle: `make bundle-rsync`
-- build + installer pipeline: `make windows-all`
-
-For runnable packaging outside MSYS2 on Windows:
-
-```bash
-make windows-deploy
-```
-
-On Windows, selected folder paths are converted to MSYS2 POSIX format before rsync call, example: `C:\Data\Backup\` -> `/cygdrive/c/Data/Backup/`

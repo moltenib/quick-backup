@@ -43,7 +43,7 @@ To build the program locally, the dependencies below must be met:
 
 #### Windows build
 
-Compiling this program on Windows requires a MSYS2 MinGW64 environment.
+Compiling this program on Windows requires an MSYS2 MinGW64 environment.
 
 ###### Installing the dependencies
 

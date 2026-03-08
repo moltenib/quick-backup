@@ -78,7 +78,7 @@ make windows-deploy
 make windows-installer
 ```
 
-### Outputs:
+###### Outputs
 
 - `dist/simple-mirror.exe`
 - `simple-mirror-setup-<version>.exe` (from `APP_VERSION`, default derived from `git describe`)

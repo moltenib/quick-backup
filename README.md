@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This back-up utility, based on `rsync`, takes the following parameters:
+This is a simple graphical back-up utility, intended to simplify usage of `rsync` on both Windows and Linux. It takes the following parameters:
 
 - Origin: the directory to be mirrored. It will not be altered by this program.
 - Destination: a directory to copy the differences into. Choosing the correct path is crucial; entering this parameter without proper care may have unintended consequences.

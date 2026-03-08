@@ -13,7 +13,7 @@ As with `rsync`, the process is as follows:
 2) Files that do not exist in the origin are **removed** to keep the destination up to date.
 3) Files in the destination with a different modification date from those in the origin folder are overwritten.
 
-Of those, step **2** can be skipped by holding _Shift_ and clicking "Combine";  rather than create a mirror of the origin, this will merge the contents of two directories into the destination.
+Of those, step **2** can be skipped by holding _Shift_ and clicking "Combine"; rather than create a mirror of the origin, this will merge the contents of two directories into the destination.
 
 ## Installation
 
@@ -103,23 +103,22 @@ Double-click the output file: `simple-mirror.exe`.
 
 ### All `make` targets
 
-- `make run`: build and run
-- `make clean`: remove objects, binary, compiled `.qm`
-- `make clean-all`: full cleanup (`clean`, MSYS2 bundle/cache, `dist`, installer `.exe`)
-- `make translations`: compile `resources/locales/<lang>/LC_MESSAGES/simple-mirror.ts` to `.qm`
-- `make bundle-rsync`: download and bundle MSYS2 `rsync` into `runtime/msys2`
-- `make clean-bundle`: remove bundled rsync and cache
-- `make windows-deploy`: create `dist/` with `simple-mirror.exe`, MinGW runtime DLLs, Qt runtime via `windeployqt`, locales, and bundled rsync if present
-- `make windows-installer`: run `windows-deploy` and build an NSIS installer (`simple-mirror-setup-<version>.exe`)
-- `make windows-all`: Windows pipeline (`all` + `windows-installer`, and auto `bundle-rsync` when no deploy lock is present)
-- `make windows-clean-deploy`: remove `dist/`
-
+- `make run`: build and run.
+- `make clean`: remove objects, binary, compiled `.qm`.
+- `make clean-all`: full cleanup (`clean`, MSYS2 bundle/cache, `dist`, installer `.exe`).
+- `make translations`: compile `resources/locales/<lang>/LC_MESSAGES/simple-mirror.ts` to `.qm`.
+- `make bundle-rsync`: download and bundle MSYS2 `rsync` into `runtime/msys2`.
+- `make clean-bundle`: remove bundled rsync and cache.
+- `make windows-deploy`: create `dist/` with `simple-mirror.exe`, MinGW runtime DLLs, Qt runtime via `windeployqt`, locales, and bundled rsync if present.
+- `make windows-installer`: run `windows-deploy` and build an NSIS installer (`simple-mirror-setup-<version>.exe`).
+- `make windows-all`: Windows pipeline (`all` + `windows-installer`, and auto `bundle-rsync` when no deploy lock is present).
+- `make windows-clean-deploy`: remove `dist/`.
 
 ### Translations
 
 The default language is English. On start, the system locale is used if an associated `resources/locales/<lang>/LC_MESSAGES/simple-mirror.qm` exists.
 
-Included: `de`, `es`, `pt`, `it`, `nl`, `fr`, `zh_CN`, `ja`
+Included: `de`, `es`, `pt`, `it`, `nl`, `fr`, `zh_CN`, `ja`.
 
 ### Windows rsync resolution
 
@@ -132,5 +131,4 @@ Included: `de`, `es`, `pt`, `it`, `nl`, `fr`, `zh_CN`, `ja`
 
 ### MSYS2 runtime
 
-On Windows, Simple Mirror requires an MSYS2-compatible `rsync` runtime (`msys-2.0.dll`)
-Random `PATH` rsync binaries are ignored to avoid mixed-runtime failures
+On Windows, Simple Mirror requires an MSYS2-compatible `rsync` runtime (`msys-2.0.dll`). Random `PATH` rsync binaries are ignored to avoid mixed-runtime error.

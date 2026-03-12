@@ -50,7 +50,7 @@ jobs:
           TAG="${GITHUB_REF#refs/tags/}"
           VER="${TAG#v}"
 
-          INSTALLER="$(ls -1 simple-mirror-setup-*.exe | head -n 1)"
+          INSTALLER="$(ls -1 simple-mirror-setup*.exe | head -n 1)"
           SHA256="$(sha256sum "${INSTALLER}" | awk '{print $1}')"
           SIZE="$(stat -c%s "${INSTALLER}")"
 
@@ -77,6 +77,7 @@ jobs:
           name: windows-output
           path: |
             simple-mirror-setup-*.exe
+            simple-mirror-setup.exe
             manifest.json
 
       - name: Create GitHub release
@@ -85,5 +86,5 @@ jobs:
         with:
           generate_release_notes: true
           files: |
-            simple-mirror-setup-*.exe
+            simple-mirror-setup*.exe
             manifest.json

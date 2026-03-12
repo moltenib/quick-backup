@@ -90,7 +90,7 @@ make windows-installer
 
 #### Windows
 
-- Installer: `simple-mirror-setup-<version>.exe` (from `APP_VERSION`, default derived from `git describe`).
+- Installer: `simple-mirror-setup.exe` or `simple-mirror-setup-<version>.exe` (`APP_VERSION` is optional and defaults to `git describe` when available).
 - Executable: `dist/simple-mirror.exe`.
 
 Please note that the internally rendered `/cygwin` path is only available outside of MSYS2. For the program to work, it must be opened from `explorer.exe`:
@@ -112,7 +112,7 @@ Then double-click the output file: `simple-mirror.exe`.
 - `make bundle-rsync`: download and bundle MSYS2 `rsync` into `runtime/msys2`.
 - `make clean-bundle`: remove bundled rsync and cache.
 - `make windows-deploy`: create `dist/` with `simple-mirror.exe`, MinGW runtime DLLs, Qt runtime via `windeployqt`, locales, and bundled rsync if present.
-- `make windows-installer`: run `windows-deploy` and build an NSIS installer (`simple-mirror-setup-<version>.exe`).
+- `make windows-installer`: run `windows-deploy` and build an NSIS installer (`simple-mirror-setup.exe` or `simple-mirror-setup-<version>.exe`).
 - `make windows-all`: Windows pipeline (`all` + `windows-installer`, and auto `bundle-rsync` when no deploy lock is present).
 - `make windows-clean-deploy`: remove `dist/`.
 

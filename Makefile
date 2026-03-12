@@ -17,8 +17,11 @@ ROOT_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 # Override via environment: `APP_VERSION=1.2.3 make windows-installer`
 APP_VERSION ?= $(shell cd "$(ROOT_DIR)" && (git describe --tags --dirty --always 2>/dev/null || true) | sed 's/^v//' | tr -d '\r\n')
 APP_VERSION := $(strip $(APP_VERSION))
+INSTALLER_BASENAME := simple-mirror-setup
 ifeq ($(APP_VERSION),)
-APP_VERSION := dev
+INSTALLER_FILENAME := $(INSTALLER_BASENAME).exe
+else
+INSTALLER_FILENAME := $(INSTALLER_BASENAME)-$(APP_VERSION).exe
 endif
 UNAME_S := $(shell uname -s 2>/dev/null || echo)
 IS_WINDOWS := $(if $(filter Windows_NT,$(OS))$(filter MSYS% MINGW% CYGWIN%,$(UNAME_S)),1,0)
@@ -131,8 +134,8 @@ ifeq ($(IS_WINDOWS),1)
 		exit 1; \
 	fi
 	MSYS2_ARG_CONV_EXCL='/INPUTCHARSET;/OUTPUTCHARSET' \
-	"$(NSIS)" /INPUTCHARSET UTF8 /OUTPUTCHARSET UTF8 -DAPP_VERSION="$(APP_VERSION)" "$(NSIS_SCRIPT)"
-	@echo "NSIS installer created: $(ROOT_DIR)/simple-mirror-setup-$(APP_VERSION).exe"
+	"$(NSIS)" /INPUTCHARSET UTF8 /OUTPUTCHARSET UTF8 -DAPP_VERSION="$(APP_VERSION)" -DOUTPUT_NAME="$(INSTALLER_FILENAME)" "$(NSIS_SCRIPT)"
+	@echo "NSIS installer created: $(ROOT_DIR)/$(INSTALLER_FILENAME)"
 else
 	@echo "windows-installer is $(WINDOWS_ENV_MSG)"
 	@exit 1
@@ -159,7 +162,7 @@ clean:
 	rm -f $(BIN) $(QM_FILES)
 
 clean-all: clean clean-bundle windows-clean-deploy
-	rm -f "$(ROOT_DIR)"/simple-mirror-setup-*.exe
+	rm -f "$(ROOT_DIR)"/simple-mirror-setup*.exe
 	rm -rf "$(ROOT_DIR)/.cache"
 
 clean-bundle:

@@ -6,7 +6,15 @@ RequestExecutionLevel admin
 !include "x64.nsh"
 
 !ifndef APP_VERSION
-!define APP_VERSION "dev"
+!define APP_VERSION ""
+!endif
+
+!ifndef OUTPUT_NAME
+!if "${APP_VERSION}" == ""
+!define OUTPUT_NAME "simple-mirror-setup.exe"
+!else
+!define OUTPUT_NAME "simple-mirror-setup-${APP_VERSION}.exe"
+!endif
 !endif
 
 !if /FileExists "..\dist\simple-mirror.exe"
@@ -16,11 +24,11 @@ RequestExecutionLevel admin
 
 !define APP_NAME "Simple Mirror"
 !define APP_EXE "simple-mirror.exe"
-!define COMPANY_NAME "Simple Mirror"
+!define COMPANY_NAME "Bruno Molteni"
 !define UNINSTALL_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Simple Mirror"
 
 Name "${APP_NAME}"
-OutFile "..\simple-mirror-setup-${APP_VERSION}.exe"
+OutFile "..\${OUTPUT_NAME}"
 InstallDir "$PROGRAMFILES64\Simple Mirror"
 InstallDirRegKey HKLM "Software\Simple Mirror" "Install_Dir"
 
